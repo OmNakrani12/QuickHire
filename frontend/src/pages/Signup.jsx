@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, Mail, Lock, User, Loader2 } from "lucide-react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase/config";
+import { auth, googleProvider } from "../firebase/config";
+import { signInWithPopup } from "firebase/auth";
+import { FcGoogle } from "react-icons/fc";
 
 export default function SignupPage() {
     const navigate = useNavigate();
@@ -16,6 +18,81 @@ export default function SignupPage() {
     });
     const [loading, setLoading] = useState(false);
 
+    const handleGoogleSignup = async () => {
+        try {
+            setLoading(true);
+
+            const result = await signInWithPopup(auth, googleProvider);
+            const googleUser = result.user;
+
+            const userPayload = {
+                name: googleUser.displayName,
+                email: googleUser.email,
+                phone: googleUser.phoneNumber || "",
+                role: "worker",
+            };
+
+            let backendUser = null;
+
+            const res = await fetch(
+                `http://localhost:8080/api/users/email/${googleUser.email}`
+            );
+
+            if (res.status === 404) {
+                // 🔹 user not found → create
+                const createRes = await fetch(
+                    "http://localhost:8080/api/users",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(userPayload),
+                    }
+                );
+
+                if (!createRes.ok) {
+                    throw new Error("Failed to create user");
+                }
+
+                backendUser = await createRes.json();
+            } 
+            else if (res.ok) {
+                const text = await res.text();
+
+                if (!text) {
+                    // backend returned empty body → treat as new user
+                    const createRes = await fetch(
+                        "http://localhost:8080/api/users",
+                        {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(userPayload),
+                        }
+                    );
+
+                    backendUser = await createRes.json();
+                } else {
+                    backendUser = JSON.parse(text);
+                }
+            } 
+            else {
+                throw new Error("Failed to fetch user");
+            }
+
+            // 🛡️ HARD SAFETY CHECK
+            if (!backendUser || !backendUser.id) {
+                throw new Error("Invalid user data from backend");
+            }
+
+            localStorage.setItem("user", JSON.stringify(backendUser));
+            navigate("/worker/dashboard");
+
+        } catch (error) {
+            console.error("Google signup error:", error);
+            alert(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (formData.password !== formData.confirmPassword) {
@@ -51,6 +128,19 @@ export default function SignupPage() {
             } else {
                 navigate("/contractor/dashboard");
             }
+            await fetch("http://localhost:8080/api/users", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    uid: user.uid,
+                    name: formData.name,
+                    email: formData.email,
+                    role: formData.role,
+                    phone: formData.phone,
+                }),
+            });
         } catch (error) {
             console.error(error);
             alert(error.message);
@@ -204,6 +294,23 @@ export default function SignupPage() {
                             Login
                         </Link>
                     </p>
+                    {/* Divider */}
+                    <div className="flex items-center my-6">
+                        <div className="flex-grow h-px bg-slate-200" />
+                        <span className="px-4 text-sm text-slate-500">OR</span>
+                        <div className="flex-grow h-px bg-slate-200" />
+                    </div>
+
+                    {/* Google Signup */}
+                    <button
+                        type="button"
+                        onClick={handleGoogleSignup}
+                        disabled={loading}
+                        className="w-full flex items-center justify-center gap-3 border border-slate-300 rounded-lg py-3 hover:bg-slate-50 transition font-medium"
+                    >
+                        <FcGoogle className="w-5 h-5" />
+                        Continue with Google
+                    </button>
                 </div>
             </div>
         </div>

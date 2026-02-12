@@ -14,6 +14,9 @@ public class User {
     private String email;
     private String phone;
     private String role;
+    private String location;
+    private String bio;
+    private String profilePhoto;
 
     // getters & setters
     public Long getId() { return id; }
@@ -27,7 +30,21 @@ public class User {
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
-    
+
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
+    public String getProfilePhoto() {
+        return profilePhoto;
+    }
+
+    public void setProfilePhoto(String profilePhoto) {
+        this.profilePhoto = profilePhoto;
+    }
 }

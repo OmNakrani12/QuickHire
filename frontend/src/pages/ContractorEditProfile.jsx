@@ -10,14 +10,12 @@ import {
     Camera,
     Save,
     X,
-    Plus,
-    Trash2,
-    DollarSign,
-    Clock,
-    FileText,
+    Building2,
+    Calendar,
+    Users,
 } from 'lucide-react';
 
-export default function EditProfile() {
+export default function ContractorEditProfile() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -25,25 +23,25 @@ export default function EditProfile() {
     const [photoPreview, setPhotoPreview] = useState(null);
     const [uid, setUid] = useState(0);
 
+    // Form state
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
         location: '',
         bio: '',
-        hourlyRate: '',
-        experience: '',
-        availability: 'full-time',
-        skills: [],
-        certifications: [],
+        companyName: '',
+        companyType: 'General Contractor',
+        yearsInBusiness: '',
+        licenseNumber: '',
+        insuranceProvider: '',
+        website: '',
     });
 
-    const [newSkill, setNewSkill] = useState('');
-    const [newCertification, setNewCertification] = useState('');
     const fetchProfile = async (email) => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/workers/profile/email/${email}`
+                `http://localhost:8080/api/users/email/${email}`
             );
 
             if (!response.ok) {
@@ -51,21 +49,19 @@ export default function EditProfile() {
                 return;
             }
 
-            // ✅ Read body ONCE
             const text = await response.text();
             if (!text) {
                 console.warn("Empty response from backend");
                 return;
             }
 
-            // ✅ Parse JSON manually
             const data = JSON.parse(text);
-
             setUser(data);
-            console.log("Fetched profile data:", data);
+
             if (data.profilePhoto) {
                 setPhotoPreview(data.profilePhoto);
             }
+            setUid(data.id);
             setFormData(prev => ({
                 ...prev,
                 name: data.name || '',
@@ -73,20 +69,20 @@ export default function EditProfile() {
                 phone: data.phone || '',
                 location: data.location || '',
                 bio: data.bio || '',
-                hourlyRate: data.hourlyRate || '',
-                experience: data.experience || '',
-                availability: data.availability || 'full-time',
-                skills: data.skills || prev.skills,
-                certifications: data.certifications || prev.certifications,
+                companyName: data.companyName || '',
+                companyType: data.companyType || 'General Contractor',
+                yearsInBusiness: data.yearsInBusiness || '',
+                licenseNumber: data.licenseNumber || '',
+                insuranceProvider: data.insuranceProvider || '',
+                website: data.website || '',
             }));
-            console.log(data.email);
         } catch (error) {
             console.error("Error fetching user profile:", error);
             alert("Failed to load profile");
         }
     };
-    useEffect(() => {
 
+    useEffect(() => {
         const userData = localStorage.getItem('user');
         if (userData) {
             const parsedUser = JSON.parse(userData);
@@ -96,17 +92,19 @@ export default function EditProfile() {
                 setPhotoPreview(parsedUser.profilePhoto);
             }
 
+            // Initialize form with existing user data
             setFormData({
                 name: parsedUser.name || '',
                 email: parsedUser.email || '',
                 phone: parsedUser.phone || '',
                 location: parsedUser.location || '',
                 bio: parsedUser.bio || '',
-                hourlyRate: parsedUser.hourlyRate || '',
-                experience: parsedUser.experience || '',
-                availability: parsedUser.availability || 'full-time',
-                skills: parsedUser.skills || ['Construction', 'Plumbing', 'Electrical', 'Carpentry', 'Painting'],
-                certifications: parsedUser.certifications || ['OSHA Safety Certified', 'Licensed Electrician'],
+                companyName: parsedUser.companyName || '',
+                companyType: parsedUser.companyType || 'General Contractor',
+                yearsInBusiness: parsedUser.yearsInBusiness || '',
+                licenseNumber: parsedUser.licenseNumber || '',
+                insuranceProvider: parsedUser.insuranceProvider || '',
+                website: parsedUser.website || '',
             });
             fetchProfile(parsedUser.email);
         } else {
@@ -114,7 +112,6 @@ export default function EditProfile() {
         }
     }, [navigate]);
 
-    // Debug: Monitor photoPreview changes
     useEffect(() => {
         console.log('📸 photoPreview state changed:', photoPreview ? 'Image loaded' : 'No image');
         if (photoPreview) {
@@ -134,101 +131,61 @@ export default function EditProfile() {
         const file = e.target.files[0];
         console.log('=== Photo Upload Started ===');
         console.log('File selected:', file);
-        console.log('File name:', file?.name);
-        console.log('File type:', file?.type);
-        console.log('File size:', file?.size);
 
         if (file && file.type.startsWith('image/')) {
             setProfilePhoto(file);
             console.log('✓ Valid image file, creating preview...');
 
-            // Create preview
             const reader = new FileReader();
             reader.onloadend = () => {
                 console.log('✓ FileReader completed');
-                console.log('Result length:', reader.result?.length);
-                console.log('Result preview:', reader.result?.substring(0, 50) + '...');
                 setPhotoPreview(reader.result);
                 console.log('✓ Photo preview state updated');
             };
             reader.onerror = (error) => {
                 console.error('✗ Error reading file:', error);
             };
-            reader.onprogress = (e) => {
-                console.log('Reading progress:', Math.round((e.loaded / e.total) * 100) + '%');
-            };
             reader.readAsDataURL(file);
         } else {
             console.log('✗ Invalid file type or no file selected');
-            if (file) {
-                console.log('File type was:', file.type);
-            }
         }
         console.log('=== Photo Upload Handler Complete ===');
-    };
-
-    const handleAddSkill = () => {
-        if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
-            setFormData(prev => ({
-                ...prev,
-                skills: [...prev.skills, newSkill.trim()]
-            }));
-            setNewSkill('');
-        }
-    };
-
-    const handleRemoveSkill = (skillToRemove) => {
-        setFormData(prev => ({
-            ...prev,
-            skills: prev.skills.filter(skill => skill !== skillToRemove)
-        }));
-    };
-
-    const handleAddCertification = () => {
-        if (newCertification.trim() && !formData.certifications.includes(newCertification.trim())) {
-            setFormData(prev => ({
-                ...prev,
-                certifications: [...prev.certifications, newCertification.trim()]
-            }));
-            setNewCertification('');
-        }
-    };
-
-    const handleRemoveCertification = (certToRemove) => {
-        setFormData(prev => ({
-            ...prev,
-            certifications: prev.certifications.filter(cert => cert !== certToRemove)
-        }));
     };
 
     const handleSave = async () => {
         setIsSaving(true);
 
-        // Simulate API call
-        await fetch(`http://localhost:8080/api/workers/profile/${formData.email}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                ...formData,
-                profilePhoto: photoPreview,
-            }),
-        });
-        setTimeout(() => {
-            const updatedUser = {
-                ...user,
-                ...formData,
-                profilePhoto: photoPreview || user.profilePhoto
-            };
-            localStorage.setItem('user', JSON.stringify(updatedUser));
+        try {
+            await fetch(`http://localhost:8080/api/users/${uid}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    profilePhoto: photoPreview,
+                }),
+            });
+
+            setTimeout(() => {
+                const updatedUser = {
+                    ...user,
+                    ...formData,
+                    profilePhoto: photoPreview || user.profilePhoto
+                };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                setIsSaving(false);
+                navigate('/contractor/dashboard');
+            }, 1000);
+        } catch (error) {
+            console.error('Error saving profile:', error);
             setIsSaving(false);
-            navigate('/worker/dashboard');
-        }, 1000);
+            alert('Failed to save profile');
+        }
     };
 
     const handleCancel = () => {
-        navigate('/worker/dashboard');
+        navigate('/contractor/dashboard');
     };
 
     if (!user) return null;
@@ -241,7 +198,7 @@ export default function EditProfile() {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-4xl font-bold gradient-text mb-2">Edit Profile</h1>
-                            <p className="text-slate-600">Update your professional information</p>
+                            <p className="text-slate-600">Update your company information</p>
                         </div>
                         <button
                             onClick={handleCancel}
@@ -263,8 +220,8 @@ export default function EditProfile() {
                                     className="w-32 h-32 rounded-full object-cover shadow-xl border-4 border-white"
                                 />
                             ) : (
-                                <div className="w-32 h-32 bg-gradient-to-br from-primary-600 to-primary-700 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-xl">
-                                    {formData.name.charAt(0)}
+                                <div className="w-32 h-32 bg-gradient-to-br from-secondary-600 to-secondary-700 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-xl">
+                                    {formData.name.charAt(0) || 'C'}
                                 </div>
                             )}
                             <input
@@ -279,12 +236,12 @@ export default function EditProfile() {
                                 onClick={() => document.getElementById('photo-upload').click()}
                                 className="absolute bottom-0 right-0 p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 border-4 border-white"
                             >
-                                <Camera className="w-5 h-5 text-primary-600" />
+                                <Camera className="w-5 h-5 text-secondary-600" />
                             </button>
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold mb-2">Profile Photo</h3>
-                            <p className="text-slate-600 mb-3">Upload a professional photo to help contractors recognize you</p>
+                            <h3 className="text-xl font-bold mb-2">Company Logo</h3>
+                            <p className="text-slate-600 mb-3">Upload your company logo or profile photo</p>
                             <button
                                 type="button"
                                 onClick={() => document.getElementById('photo-upload').click()}
@@ -300,7 +257,7 @@ export default function EditProfile() {
                 {/* Personal Information */}
                 <div className="card p-8 mb-6 animate-slide-up">
                     <h2 className="text-2xl font-bold mb-6 flex items-center">
-                        <User className="w-6 h-6 mr-2 text-primary-600" />
+                        <User className="w-6 h-6 mr-2 text-secondary-600" />
                         Personal Information
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -375,154 +332,104 @@ export default function EditProfile() {
                                 onChange={handleInputChange}
                                 rows="4"
                                 className="input resize-none"
-                                placeholder="Tell contractors about your experience and what makes you a great worker..."
+                                placeholder="Tell workers about your company and what makes you a great employer..."
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* Professional Details */}
+                {/* Company Information */}
                 <div className="card p-8 mb-6 animate-slide-up">
                     <h2 className="text-2xl font-bold mb-6 flex items-center">
-                        <Briefcase className="w-6 h-6 mr-2 text-primary-600" />
-                        Professional Details
+                        <Building2 className="w-6 h-6 mr-2 text-secondary-600" />
+                        Company Information
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                Hourly Rate
+                                Company Name
+                            </label>
+                            <input
+                                type="text"
+                                name="companyName"
+                                value={formData.companyName}
+                                onChange={handleInputChange}
+                                className="input"
+                                placeholder="ABC Construction Inc."
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                Company Type
+                            </label>
+                            <select
+                                name="companyType"
+                                value={formData.companyType}
+                                onChange={handleInputChange}
+                                className="input"
+                            >
+                                <option value="General Contractor">General Contractor</option>
+                                <option value="Subcontractor">Subcontractor</option>
+                                <option value="Construction Company">Construction Company</option>
+                                <option value="Property Management">Property Management</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                Years in Business
                             </label>
                             <div className="relative">
-                                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                                 <input
                                     type="number"
-                                    name="hourlyRate"
-                                    value={formData.hourlyRate}
+                                    name="yearsInBusiness"
+                                    value={formData.yearsInBusiness}
                                     onChange={handleInputChange}
                                     className="input pl-11"
-                                    placeholder="25"
+                                    placeholder="15"
                                 />
                             </div>
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                Years of Experience
+                                License Number
                             </label>
-                            <div className="relative">
-                                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                <input
-                                    type="number"
-                                    name="experience"
-                                    value={formData.experience}
-                                    onChange={handleInputChange}
-                                    className="input pl-11"
-                                    placeholder="5"
-                                />
-                            </div>
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                Availability
-                            </label>
-                            <select
-                                name="availability"
-                                value={formData.availability}
+                            <input
+                                type="text"
+                                name="licenseNumber"
+                                value={formData.licenseNumber}
                                 onChange={handleInputChange}
                                 className="input"
-                            >
-                                <option value="full-time">Full-time</option>
-                                <option value="part-time">Part-time</option>
-                                <option value="weekends">Weekends Only</option>
-                                <option value="flexible">Flexible</option>
-                            </select>
+                                placeholder="LIC-123456"
+                            />
                         </div>
-                    </div>
-                </div>
-
-                {/* Skills Section */}
-                <div className="card p-8 mb-6 animate-slide-up">
-                    <h2 className="text-2xl font-bold mb-6 flex items-center">
-                        <Award className="w-6 h-6 mr-2 text-primary-600" />
-                        Skills
-                    </h2>
-                    <div className="mb-4">
-                        <div className="flex gap-2">
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                Insurance Provider
+                            </label>
                             <input
                                 type="text"
-                                value={newSkill}
-                                onChange={(e) => setNewSkill(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && handleAddSkill()}
-                                className="input flex-1"
-                                placeholder="Add a skill (e.g., Welding, Carpentry)"
+                                name="insuranceProvider"
+                                value={formData.insuranceProvider}
+                                onChange={handleInputChange}
+                                className="input"
+                                placeholder="ABC Insurance Co."
                             />
-                            <button
-                                onClick={handleAddSkill}
-                                className="btn btn-primary"
-                            >
-                                <Plus className="w-5 h-5" />
-                            </button>
                         </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {formData.skills.map((skill, index) => (
-                            <div
-                                key={index}
-                                className="badge badge-info flex items-center gap-2 px-4 py-2 text-base"
-                            >
-                                {skill}
-                                <button
-                                    onClick={() => handleRemoveSkill(skill)}
-                                    className="hover:text-red-600 transition-colors"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Certifications Section */}
-                <div className="card p-8 mb-6 animate-slide-up">
-                    <h2 className="text-2xl font-bold mb-6 flex items-center">
-                        <FileText className="w-6 h-6 mr-2 text-primary-600" />
-                        Certifications
-                    </h2>
-                    <div className="mb-4">
-                        <div className="flex gap-2">
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                Website
+                            </label>
                             <input
-                                type="text"
-                                value={newCertification}
-                                onChange={(e) => setNewCertification(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && handleAddCertification()}
-                                className="input flex-1"
-                                placeholder="Add a certification (e.g., OSHA Safety Certified)"
+                                type="url"
+                                name="website"
+                                value={formData.website}
+                                onChange={handleInputChange}
+                                className="input"
+                                placeholder="https://www.example.com"
                             />
-                            <button
-                                onClick={handleAddCertification}
-                                className="btn btn-primary"
-                            >
-                                <Plus className="w-5 h-5" />
-                            </button>
                         </div>
-                    </div>
-                    <div className="space-y-2">
-                        {formData.certifications.map((cert, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
-                            >
-                                <div className="flex items-center">
-                                    <Award className="w-5 h-5 text-green-600 mr-3" />
-                                    <span className="font-medium">{cert}</span>
-                                </div>
-                                <button
-                                    onClick={() => handleRemoveCertification(cert)}
-                                    className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                                >
-                                    <Trash2 className="w-4 h-4 text-red-600" />
-                                </button>
-                            </div>
-                        ))}
                     </div>
                 </div>
 
