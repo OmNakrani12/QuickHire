@@ -21,9 +21,7 @@ export default function ContractorEditProfile() {
     const [isSaving, setIsSaving] = useState(false);
     const [profilePhoto, setProfilePhoto] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
-    const [uid, setUid] = useState(0);
 
-    // Form state
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -38,10 +36,13 @@ export default function ContractorEditProfile() {
         website: '',
     });
 
+    // =========================
+    // FETCH CONTRACTOR PROFILE
+    // =========================
     const fetchProfile = async (email) => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/users/email/${email}`
+                `http://localhost:8080/api/contractors/profile/email/${email}`
             );
 
             if (!response.ok) {
@@ -49,21 +50,14 @@ export default function ContractorEditProfile() {
                 return;
             }
 
-            const text = await response.text();
-            if (!text) {
-                console.warn("Empty response from backend");
-                return;
-            }
-
-            const data = JSON.parse(text);
+            const data = await response.json();
             setUser(data);
 
             if (data.profilePhoto) {
                 setPhotoPreview(data.profilePhoto);
             }
-            setUid(data.id);
-            setFormData(prev => ({
-                ...prev,
+
+            setFormData({
                 name: data.name || '',
                 email: data.email || '',
                 phone: data.phone || '',
@@ -71,19 +65,23 @@ export default function ContractorEditProfile() {
                 bio: data.bio || '',
                 companyName: data.companyName || '',
                 companyType: data.companyType || 'General Contractor',
-                yearsInBusiness: data.yearsInBusiness || '',
+                yearsInBusiness: data.yearsInBusiness ?? '',
                 licenseNumber: data.licenseNumber || '',
                 insuranceProvider: data.insuranceProvider || '',
                 website: data.website || '',
-            }));
+            });
+
         } catch (error) {
-            console.error("Error fetching user profile:", error);
-            alert("Failed to load profile");
+            console.error("Error fetching contractor profile:", error);
         }
     };
 
+    // =========================
+    // LOAD USER
+    // =========================
     useEffect(() => {
         const userData = localStorage.getItem('user');
+
         if (userData) {
             const parsedUser = JSON.parse(userData);
             setUser(parsedUser);
@@ -92,21 +90,8 @@ export default function ContractorEditProfile() {
                 setPhotoPreview(parsedUser.profilePhoto);
             }
 
-            // Initialize form with existing user data
-            setFormData({
-                name: parsedUser.name || '',
-                email: parsedUser.email || '',
-                phone: parsedUser.phone || '',
-                location: parsedUser.location || '',
-                bio: parsedUser.bio || '',
-                companyName: parsedUser.companyName || '',
-                companyType: parsedUser.companyType || 'General Contractor',
-                yearsInBusiness: parsedUser.yearsInBusiness || '',
-                licenseNumber: parsedUser.licenseNumber || '',
-                insuranceProvider: parsedUser.insuranceProvider || '',
-                website: parsedUser.website || '',
-            });
             fetchProfile(parsedUser.email);
+
         } else {
             navigate('/login');
         }
@@ -114,71 +99,69 @@ export default function ContractorEditProfile() {
 
     useEffect(() => {
         console.log('📸 photoPreview state changed:', photoPreview ? 'Image loaded' : 'No image');
-        if (photoPreview) {
-            console.log('Preview data length:', photoPreview.length);
-        }
     }, [photoPreview]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: name === "yearsInBusiness"
+                ? (value === '' ? '' : Number(value))
+                : value
         }));
     };
 
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
-        console.log('=== Photo Upload Started ===');
-        console.log('File selected:', file);
 
         if (file && file.type.startsWith('image/')) {
-            setProfilePhoto(file);
-            console.log('✓ Valid image file, creating preview...');
-
             const reader = new FileReader();
             reader.onloadend = () => {
-                console.log('✓ FileReader completed');
                 setPhotoPreview(reader.result);
-                console.log('✓ Photo preview state updated');
-            };
-            reader.onerror = (error) => {
-                console.error('✗ Error reading file:', error);
             };
             reader.readAsDataURL(file);
-        } else {
-            console.log('✗ Invalid file type or no file selected');
         }
-        console.log('=== Photo Upload Handler Complete ===');
     };
 
+    // =========================
+    // SAVE CONTRACTOR PROFILE
+    // =========================
     const handleSave = async () => {
         setIsSaving(true);
 
         try {
-            await fetch(`http://localhost:8080/api/users/${uid}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    ...formData,
-                    profilePhoto: photoPreview,
-                }),
-            });
+            await fetch(
+                `http://localhost:8080/api/contractors/profile/${formData.email}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        ...formData,
+                        yearsInBusiness:
+                            formData.yearsInBusiness === ''
+                                ? null
+                                : formData.yearsInBusiness,
+                        profilePhoto: photoPreview,
+                    }),
+                }
+            );
 
-            setTimeout(() => {
-                const updatedUser = {
-                    ...user,
-                    ...formData,
-                    profilePhoto: photoPreview || user.profilePhoto
-                };
-                localStorage.setItem('user', JSON.stringify(updatedUser));
-                setIsSaving(false);
-                navigate('/contractor/dashboard');
-            }, 1000);
+            const updatedUser = {
+                ...user,
+                ...formData,
+                profilePhoto: photoPreview || user.profilePhoto
+            };
+
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+
+            setIsSaving(false);
+            navigate('/contractor/dashboard');
+
         } catch (error) {
-            console.error('Error saving profile:', error);
+            console.error('Error saving contractor profile:', error);
             setIsSaving(false);
             alert('Failed to save profile');
         }
@@ -386,6 +369,7 @@ export default function ContractorEditProfile() {
                                     name="yearsInBusiness"
                                     value={formData.yearsInBusiness}
                                     onChange={handleInputChange}
+                                    onWheel={(e) => e.target.blur()}
                                     className="input pl-11"
                                     placeholder="15"
                                 />

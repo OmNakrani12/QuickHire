@@ -73,8 +73,8 @@ export default function EditProfile() {
                 phone: data.phone || '',
                 location: data.location || '',
                 bio: data.bio || '',
-                hourlyRate: data.hourlyRate || '',
-                experience: data.experience || '',
+                hourlyRate: data.hourlyRate ?? '',
+                experience: data.experience ?? '',
                 availability: data.availability || 'full-time',
                 skills: data.skills || prev.skills,
                 certifications: data.certifications || prev.certifications,
@@ -102,8 +102,8 @@ export default function EditProfile() {
                 phone: parsedUser.phone || '',
                 location: parsedUser.location || '',
                 bio: parsedUser.bio || '',
-                hourlyRate: parsedUser.hourlyRate || '',
-                experience: parsedUser.experience || '',
+                hourlyRate: parsedUser.hourlyRate ?? '',
+                experience: parsedUser.experience ?? '',
                 availability: parsedUser.availability || 'full-time',
                 skills: parsedUser.skills || ['Construction', 'Plumbing', 'Electrical', 'Carpentry', 'Painting'],
                 certifications: parsedUser.certifications || ['OSHA Safety Certified', 'Licensed Electrician'],
@@ -124,9 +124,12 @@ export default function EditProfile() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: name === "experience" || name === "hourlyRate"
+                ? (value === '' ? '' : Number(value))
+                : value
         }));
     };
 
@@ -212,6 +215,8 @@ export default function EditProfile() {
             },
             body: JSON.stringify({
                 ...formData,
+                hourlyRate: formData.hourlyRate === '' ? null : formData.hourlyRate,
+                experience: formData.experience === '' ? null : formData.experience,
                 profilePhoto: photoPreview,
             }),
         });
@@ -399,6 +404,7 @@ export default function EditProfile() {
                                     name="hourlyRate"
                                     value={formData.hourlyRate}
                                     onChange={handleInputChange}
+                                    onWheel={(e) => e.target.blur()}
                                     className="input pl-11"
                                     placeholder="25"
                                 />
@@ -415,6 +421,7 @@ export default function EditProfile() {
                                     name="experience"
                                     value={formData.experience}
                                     onChange={handleInputChange}
+                                    onWheel={(e) => e.target.blur()}
                                     className="input pl-11"
                                     placeholder="5"
                                 />

@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface ContractorRepository extends JpaRepository<Contractor, Long> {
     Optional<Contractor> findByUserId(Long userId);
+    Optional<Contractor> findByLicenseNumber(String licenseNumber);
 }

@@ -10,16 +10,12 @@ public class Contractor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String companyName;
 
-    @Column(nullable = false)
     private String companyType;
 
-    @Column(nullable = false)
     private Integer yearsInBusiness;
 
-    @Column(nullable = false, unique = true)
     private String licenseNumber;
 
     private String insuranceProvider;
@@ -28,7 +24,7 @@ public class Contractor {
 
     // 🔹 One-to-One relationship with User
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
 
     // ✅ Default Constructor
