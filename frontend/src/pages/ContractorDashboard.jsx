@@ -9,6 +9,7 @@ import MyJobPostings from '../components/contractor/MyJobPostings';
 import ApplicationsList from '../components/contractor/ApplicationsList';
 import NewJobModal from '../components/contractor/NewJobModal';
 import ProfileView from '../components/contractor/ProfileView';
+import Messaging from '../components/contractor/Messaging';
 
 export default function ContractorDashboard() {
     const navigate = useNavigate();
@@ -181,10 +182,7 @@ export default function ContractorDashboard() {
 
                 {activeTab === 'messages' && (
                     <div className="space-y-8 animate-fade-in">
-                        <div className="card p-6">
-                            <h2 className="text-2xl font-bold mb-4">Messages</h2>
-                            <p className="text-slate-600">Messaging view coming soon...</p>
-                        </div>
+                        <Messaging/>
                     </div>
                 )}
 

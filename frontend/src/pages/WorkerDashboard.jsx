@@ -7,6 +7,7 @@ import ActiveJobs from '../components/worker/ActiveJobs';
 import RecentEarnings from '../components/worker/RecentEarnings';
 import AvailableJobs from '../components/worker/AvailableJobs';
 import ProfileView from '../components/worker/ProfileView';
+import ChatWindow from '@/components/worker/Messaging';
 
 export default function WorkerDashboard() {
     const navigate = useNavigate();
@@ -137,10 +138,7 @@ export default function WorkerDashboard() {
 
                 {activeTab === 'messages' && (
                     <div className="space-y-8 animate-fade-in">
-                        <div className="card p-6">
-                            <h2 className="text-2xl font-bold mb-4">Messages</h2>
-                            <p className="text-slate-600">Messaging view coming soon...</p>
-                        </div>
+                        <ChatWindow />
                     </div>
                 )}
 
