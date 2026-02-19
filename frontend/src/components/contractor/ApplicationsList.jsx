@@ -1,11 +1,11 @@
 import { Star } from 'lucide-react';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ApplicationsList() {
     const [applications, setApplications] = useState([]);
     useEffect(() => {
         
-    })
+    }, [])
     return (
         <div className="space-y-6 animate-fade-in">
             <div className="card p-6">

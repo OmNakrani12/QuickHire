@@ -17,6 +17,7 @@ export default function SignupPage() {
         phone: '',
     });
     const [loading, setLoading] = useState(false);
+    const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
     const handleGoogleSignup = async () => {
         try {
@@ -31,7 +32,6 @@ export default function SignupPage() {
                 phone: googleUser.phoneNumber || "",
                 role: "worker",
             };
-            const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
             let backendUser = null;
 
