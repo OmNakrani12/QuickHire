@@ -21,7 +21,7 @@ export default function ContractorEditProfile() {
     const [isSaving, setIsSaving] = useState(false);
     const [profilePhoto, setProfilePhoto] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
-
+    const BASE_URL = import.meta.env.VITE_BACKEND_URL;
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -42,7 +42,7 @@ export default function ContractorEditProfile() {
     const fetchProfile = async (email) => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/contractors/profile/email/${email}`
+                `${BASE_URL}/api/contractors/profile/email/${email}`
             );
 
             if (!response.ok) {
@@ -132,7 +132,7 @@ export default function ContractorEditProfile() {
 
         try {
             await fetch(
-                `http://localhost:8080/api/contractors/profile/${formData.email}`,
+                `${BASE_URL}/api/contractors/profile/${formData.email}`,
                 {
                     method: "PATCH",
                     headers: {

@@ -24,6 +24,7 @@ export default function EditProfile() {
     const [profilePhoto, setProfilePhoto] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [uid, setUid] = useState(0);
+    const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
     const [formData, setFormData] = useState({
         name: '',
@@ -43,7 +44,7 @@ export default function EditProfile() {
     const fetchProfile = async (email) => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/workers/profile/email/${email}`
+                `${BASE_URL}/api/workers/profile/email/${email}`
             );
 
             if (!response.ok) {
@@ -208,7 +209,7 @@ export default function EditProfile() {
         setIsSaving(true);
 
         // Simulate API call
-        await fetch(`http://localhost:8080/api/workers/profile/${formData.email}`, {
+        await fetch(`${BASE_URL}/api/workers/profile/${formData.email}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",

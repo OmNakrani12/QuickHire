@@ -13,6 +13,7 @@ export default function ChatWindow({
     const [connected, setConnected] = useState(false);
     const clientRef = useRef(null);
     const messagesEndRef = useRef(null);
+    const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
     // Auto scroll
     const scrollToBottom = () => {
@@ -23,7 +24,7 @@ export default function ChatWindow({
     const loadMessages = async () => {
         try {
             const res = await axios.get(
-                `http://localhost:8080/api/chat?senderId=${currentUserId}&receiverId=${otherUserId}`
+                `${BASE_URL}/api/chat?senderId=${currentUserId}&receiverId=${otherUserId}`
             );
             setMessages(res.data);
         } catch (error) {

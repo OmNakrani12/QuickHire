@@ -10,6 +10,7 @@ export default function NewJobModal({ isOpen, onClose }) {
         description: "",
         skills: ""
     });
+    const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
     if (!isOpen) return null;
 
@@ -23,7 +24,7 @@ export default function NewJobModal({ isOpen, onClose }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:8080/api/jobs", jobData);
+            await axios.post(`${BASE_URL}/api/jobs`, jobData);
 
             alert("Job Posted Successfully ✅");
             onClose();

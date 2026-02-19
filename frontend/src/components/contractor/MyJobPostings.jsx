@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 
 export default function MyJobPostings({ onNewJobClick }) {
     const [jobs, setJobs] = useState([]);
+    const BASE_URL = import.meta.env.VITE_BACKEND_URL;
     useEffect(() => {
         const fetchData = async() => {
-            const data = await axios.get("http://localhost:8080/api/jobs")
+            const data = await axios.get(`${BASE_URL}/api/jobs`)
                 .then((response) => {
                     setJobs(response.data);
                     console.log("Fetched jobs:", response.data);

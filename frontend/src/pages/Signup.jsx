@@ -31,17 +31,18 @@ export default function SignupPage() {
                 phone: googleUser.phoneNumber || "",
                 role: "worker",
             };
+            const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
             let backendUser = null;
 
             const res = await fetch(
-                `http://localhost:8080/api/users/email/${googleUser.email}`
+                `${BASE_URL}/api/users/email/${googleUser.email}`
             );
 
             if (res.status === 404) {
                 // 🔹 user not found → create
                 const createRes = await fetch(
-                    "http://localhost:8080/api/users",
+                    `${BASE_URL}/api/users`,
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -61,7 +62,7 @@ export default function SignupPage() {
                 if (!text) {
                     // backend returned empty body → treat as new user
                     const createRes = await fetch(
-                        "http://localhost:8080/api/users",
+                        `${BASE_URL}/api/users`,
                         {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -128,7 +129,7 @@ export default function SignupPage() {
             } else {
                 navigate("/contractor/dashboard");
             }
-            await fetch("http://localhost:8080/api/users", {
+            await fetch(`${BASE_URL}/api/users`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
