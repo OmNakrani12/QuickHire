@@ -35,7 +35,7 @@ export default function ChatWindow({
     // Connect WebSocket
     const connectWebSocket = () => {
         const stompClient = new Client({
-            brokerURL: "ws://localhost:8080/ws",
+            brokerURL: BASE_URL.replace(/^http/, "ws") + "/ws",
             reconnectDelay: 5000,
             debug: (str) => {
                 console.log("STOMP DEBUG:", str);
