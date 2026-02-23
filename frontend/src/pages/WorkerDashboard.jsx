@@ -16,7 +16,7 @@ export default function WorkerDashboard() {
 
     useEffect(() => {
         const userData = localStorage.getItem('user');
-        
+
         if (userData) {
             setUser(JSON.parse(userData));
         } else {
@@ -137,8 +137,8 @@ export default function WorkerDashboard() {
                 )}
 
                 {activeTab === 'messages' && (
-                    <div className="space-y-8 animate-fade-in">
-                        <ChatWindow />
+                    <div className="animate-fade-in">
+                        <ChatWindow theme="worker" />
                     </div>
                 )}
 

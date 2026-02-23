@@ -3,9 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, Mail, Lock, Loader2 } from "lucide-react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/config";
+import axios from "axios";
 
 export default function Login() {
   const navigate = useNavigate();
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
   const [formData, setFormData] = useState({
     email: "",
@@ -33,18 +35,18 @@ export default function Login() {
       localStorage.setItem(
         "user",
         JSON.stringify({
-          uid: user.uid,
           email: user.email,
           role: formData.role,
         })
       );
-
-      // Redirect by role
       navigate(
         formData.role === "worker"
           ? "/worker/dashboard"
           : "/contractor/dashboard"
       );
+      const data = await axios.get(`${BASE_URL}/api/users/email/${user.email}`);
+      localStorage.setItem("uid", data.data.id);
+      console.log("User ID stored in localStorage:", data.data.id);
     } catch (err) {
       setError(getFriendlyError(err.code));
     } finally {
