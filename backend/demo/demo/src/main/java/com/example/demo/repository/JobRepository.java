@@ -9,7 +9,7 @@ import java.util.List;
 public interface JobRepository extends JpaRepository<Job, Long> {
 
     // Find all jobs by contractor
-    List<Job> findByContractor(Contractor contractor);
+    List<Job> findByContractorId(Long contractorId);
 
     // Find jobs by status (OPEN / CLOSED)
     List<Job> findByStatus(String status);

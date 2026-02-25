@@ -16,13 +16,17 @@ public class ChatMessage {
     @Column(length = 1000)
     private String content;
 
+    @Column(name = "created_at")
     private LocalDateTime timestamp;
+
+    @Column(name = "is_read")
+    private boolean read = false;
 
     @PrePersist
     public void onCreate() {
         timestamp = LocalDateTime.now();
     }
-
+    
     public Long getId() {
         return id;
     }
@@ -61,5 +65,13 @@ public class ChatMessage {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 }

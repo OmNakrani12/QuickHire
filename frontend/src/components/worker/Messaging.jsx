@@ -11,12 +11,12 @@ const mockContacts = [
 ];
 
 export default function ChatWindow({
-    currentUserId = 5,
-    otherUserId: initialOtherUserId = 2,
+    currentUserId = 4,
+    otherUserId: initialOtherUserId = 1,
     otherUserName: initialOtherUserName = "User",
     theme = "worker",
 }) {
-    const [contacts] = useState(mockContacts);
+    const [contacts, setContacts] = useState(mockContacts);
     const [activeContact, setActiveContact] = useState({
         id: initialOtherUserId,
         name: initialOtherUserName,
@@ -43,7 +43,20 @@ export default function ChatWindow({
             console.error("Error loading messages", error);
         }
     };
-
+    const loadContacts = async () => {
+        try {
+            const res = await axios.get(`${BASE_URL}/api/chat/${currentUserId}/contacts`);
+            const fetchedContacts = res.data.map((c) => ({
+                id: c.user.id,
+                name: c.user.name,
+                lastMessage: c.lastMessage,
+                unread: c.unreadCount,
+            }));
+            setContacts(fetchedContacts);
+        } catch (error) {
+            console.error("Error loading contacts", error);
+        }
+    };
     const connectWebSocket = () => {
         const stompClient = new Client({
             brokerURL: BASE_URL.replace(/^http/, "ws") + "/ws",
@@ -78,6 +91,7 @@ export default function ChatWindow({
     };
 
     useEffect(() => {
+        loadContacts();
         loadMessages();
         connectWebSocket();
         return () => clientRef.current?.deactivate();

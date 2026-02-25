@@ -8,6 +8,7 @@ import {
     MessageSquare,
     Settings,
     LogOut,
+    PlusCircle,
 } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
@@ -62,6 +63,17 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                     >
                         <Users className="w-5 h-5" />
                         <span className="font-medium">Find Workers</span>
+                    </button>
+
+                    <button
+                        onClick={() => setActiveTab('post-job')}
+                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'post-job'
+                            ? 'bg-secondary-600 text-white shadow-lg'
+                            : 'text-slate-700 hover:bg-slate-100'
+                            }`}
+                    >
+                        <PlusCircle className="w-5 h-5" />
+                        <span className="font-medium">Post Job</span>
                     </button>
 
                     <button

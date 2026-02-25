@@ -45,9 +45,9 @@ export default function JobApplicationModal({ job, onClose }) {
         setErrorMsg("");
 
         try {
-            const storedUser = JSON.parse(localStorage.getItem("user"));
+            const uid = JSON.parse(localStorage.getItem("uid"));
             await axios.post(`${BASE_URL}/api/jobs/${job.id}/apply`, {
-                workerId: storedUser?.id,
+                workerId: uid,
                 coverNote: form.coverNote,
                 proposedRate: Number(form.proposedRate),
                 availableFrom: form.availableFrom,

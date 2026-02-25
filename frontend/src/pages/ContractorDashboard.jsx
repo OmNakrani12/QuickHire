@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Sidebar from '../components/contractor/Sidebar';
 import Header from '../components/contractor/Header';
 import StatsGrid from '../components/contractor/StatsGrid';
@@ -10,12 +11,31 @@ import ApplicationsList from '../components/contractor/ApplicationsList';
 import NewJobModal from '../components/contractor/NewJobModal';
 import ProfileView from '../components/contractor/ProfileView';
 import Messaging from '../components/contractor/Messaging';
+import FindWorkers from '../components/contractor/FindWorkers';
+import PostJob from '../components/contractor/PostJob';
+import Projects from '../components/contractor/Projects';
+import Loading from '../Loading';
+
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function ContractorDashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [activeTab, setActiveTab] = useState('dashboard');
     const [showNewJobModal, setShowNewJobModal] = useState(false);
+
+    // ── real dashboard data ──
+    const [stats, setStats] = useState({
+        totalBudgetSpent: 0,
+        activeProjects: 0,
+        totalWorkers: 0,
+        completedProjects: 0,
+        totalJobs: 0,
+        pendingApplications: 0,
+    });
+    const [recentProjects, setRecentProjects] = useState([]);
+    const [recentApplications, setRecentApplications] = useState([]);
+    const [dashboardLoading, setDashboardLoading] = useState(false);
 
     useEffect(() => {
         const userData = localStorage.getItem('user');
@@ -26,104 +46,89 @@ export default function ContractorDashboard() {
         }
     }, [navigate]);
 
+    // ── fetch all dashboard data when user is ready ──
+    useEffect(() => {
+        if (!user) return;
+        fetchDashboardData();
+    }, [user]);
+
+    const fetchDashboardData = async () => {
+        const contractorId = localStorage.getItem('uid');
+        if (!contractorId) return;
+
+        setDashboardLoading(true);
+        try {
+            const [projectsRes, applicationsRes, jobsRes] = await Promise.allSettled([
+                axios.get(`${BASE_URL}/api/projects/contractor/${contractorId}`),
+                axios.get(`${BASE_URL}/api/jobs/applications/contractor/${contractorId}`),
+                axios.get(`${BASE_URL}/api/jobs/contractor/${contractorId}`),
+            ]);
+
+            // ── projects ──
+            const projects = projectsRes.status === 'fulfilled' && Array.isArray(projectsRes.value.data)
+                ? projectsRes.value.data : [];
+
+            const activeProjects = projects.filter(p => p.status === 'active').length;
+            const completedProjects = projects.filter(p => p.status === 'completed').length;
+            const totalBudgetSpent = projects.reduce((s, p) => s + Number(p.spent || 0), 0);
+
+            // recent 2 projects (active first)
+            const sorted = [...projects].sort((a, b) => {
+                if (a.status === 'active' && b.status !== 'active') return -1;
+                if (b.status === 'active' && a.status !== 'active') return 1;
+                return 0;
+            });
+            setRecentProjects(sorted.slice(0, 3));
+
+            // ── applications ──
+            const apps = applicationsRes.status === 'fulfilled' && Array.isArray(applicationsRes.value.data)
+                ? applicationsRes.value.data : [];
+
+            const pendingApplications = apps.filter(a => a.status === 'PENDING').length;
+
+            // unique workers across all applications
+            const workerIds = new Set(apps.map(a => a.worker?.id).filter(Boolean));
+
+            // format recent 3 apps for the dashboard widget
+            const formattedApps = apps.slice(0, 3).map(app => ({
+                id: app.id,
+                name: app.worker?.user?.name || 'Worker',
+                job: app.job?.title || '—',
+                rating: app.worker?.rating ?? 'N/A',
+                completedJobs: app.worker?.experience ?? 0,
+                skills: app.job?.skillsRequired ? app.job.skillsRequired.split(',').map(s => s.trim()) : [],
+                appliedDate: app.appliedAt ? app.appliedAt.split('T')[0] : '—',
+                status: app.status,
+                worker: app.worker,
+            }));
+            setRecentApplications(formattedApps);
+
+            // ── jobs ──
+            const jobs = jobsRes.status === 'fulfilled' && Array.isArray(jobsRes.value.data)
+                ? jobsRes.value.data : [];
+
+            setStats({
+                totalBudgetSpent,
+                activeProjects,
+                completedProjects,
+                totalWorkers: workerIds.size,
+                totalJobs: jobs.length,
+                pendingApplications,
+            });
+        } catch (err) {
+            console.error('Dashboard fetch error:', err);
+        } finally {
+            setDashboardLoading(false);
+        }
+    };
+
     const handleLogout = () => {
         localStorage.removeItem('user');
+        localStorage.removeItem('uid');
         navigate('/');
     };
 
     if (!user) return null;
-
-    // Mock data
-    const stats = {
-        totalSpent: 125000,
-        activeProjects: 5,
-        totalWorkers: 48,
-        completedProjects: 89,
-    };
-
-    const myJobs = [
-        {
-            id: 1,
-            title: 'Office Renovation',
-            location: 'Manhattan, NY',
-            pay: '$25/hour',
-            applicants: 12,
-            hired: 3,
-            status: 'Active',
-            posted: '3 days ago',
-        },
-        {
-            id: 2,
-            title: 'Warehouse Construction',
-            location: 'Brooklyn, NY',
-            pay: '$30/hour',
-            applicants: 8,
-            hired: 5,
-            status: 'Active',
-            posted: '1 week ago',
-        },
-        {
-            id: 3,
-            title: 'Residential Plumbing',
-            location: 'Queens, NY',
-            pay: '$28/hour',
-            applicants: 15,
-            hired: 0,
-            status: 'Open',
-            posted: '2 days ago',
-        },
-    ];
-
-    const activeProjects = [
-        {
-            id: 1,
-            name: 'Downtown Office Complex',
-            workers: 12,
-            progress: 75,
-            budget: 50000,
-            spent: 37500,
-            deadline: 'Mar 15, 2026',
-        },
-        {
-            id: 2,
-            name: 'Residential Tower',
-            workers: 20,
-            progress: 45,
-            budget: 120000,
-            spent: 54000,
-            deadline: 'Apr 30, 2026',
-        },
-    ];
-
-    const workerApplications = [
-        {
-            id: 1,
-            name: 'John Smith',
-            job: 'Office Renovation',
-            rating: 4.9,
-            completedJobs: 156,
-            skills: ['Construction', 'Carpentry'],
-            appliedDate: 'Jan 29, 2026',
-        },
-        {
-            id: 2,
-            name: 'Sarah Johnson',
-            job: 'Residential Plumbing',
-            rating: 4.7,
-            completedJobs: 98,
-            skills: ['Plumbing', 'Repair'],
-            appliedDate: 'Jan 30, 2026',
-        },
-        {
-            id: 3,
-            name: 'Mike Davis',
-            job: 'Warehouse Construction',
-            rating: 4.8,
-            completedJobs: 203,
-            skills: ['Construction', 'Heavy Equipment'],
-            appliedDate: 'Jan 28, 2026',
-        },
-    ];
 
     return (
         <div className="min-h-screen flex">
@@ -139,50 +144,46 @@ export default function ContractorDashboard() {
                     onNewJobClick={() => setShowNewJobModal(true)}
                 />
 
+                {/* ── DASHBOARD OVERVIEW ── */}
                 {activeTab === 'dashboard' && (
-                    <div className="space-y-8 animate-fade-in">
-                        <StatsGrid stats={stats} />
-                        <ActiveProjects projects={activeProjects} />
-                        <RecentApplications applications={workerApplications} />
-                    </div>
+                    dashboardLoading ? (
+                        <Loading text="Loading dashboard..." />
+                    ) : (
+                        <div className="space-y-8 animate-fade-in">
+                            <StatsGrid stats={stats} />
+                            <ActiveProjects projects={recentProjects} />
+                            <RecentApplications applications={recentApplications} />
+                        </div>
+                    )
                 )}
 
-                {activeTab === 'jobs' && (
-                    <MyJobPostings
-                        jobs={myJobs}
-                        onNewJobClick={() => setShowNewJobModal(true)}
-                    />
-                )}
+                {activeTab === 'jobs' && <MyJobPostings />}
 
-                {activeTab === 'applications' && (
-                    <ApplicationsList applications={workerApplications} />
-                )}
+                {activeTab === 'applications' && <ApplicationsList />}
 
-                {activeTab === 'profile' && (
-                    <ProfileView user={user} stats={stats} />
-                )}
+                {activeTab === 'profile' && <ProfileView user={user} stats={stats} />}
 
                 {activeTab === 'projects' && (
-                    <div className="space-y-8 animate-fade-in">
-                        <div className="card p-6">
-                            <h2 className="text-2xl font-bold mb-4">Projects</h2>
-                            <p className="text-slate-600">Project management view coming soon...</p>
-                        </div>
+                    <div className="animate-fade-in">
+                        <Projects />
                     </div>
                 )}
 
                 {activeTab === 'workers' && (
-                    <div className="space-y-8 animate-fade-in">
-                        <div className="card p-6">
-                            <h2 className="text-2xl font-bold mb-4">Find Workers</h2>
-                            <p className="text-slate-600">Worker search view coming soon...</p>
-                        </div>
+                    <div className="animate-fade-in">
+                        <FindWorkers />
+                    </div>
+                )}
+
+                {activeTab === 'post-job' && (
+                    <div className="animate-fade-in">
+                        <PostJob />
                     </div>
                 )}
 
                 {activeTab === 'messages' && (
-                    <div className="space-y-8 animate-fade-in">
-                        <Messaging/>
+                    <div className="animate-fade-in">
+                        <Messaging />
                     </div>
                 )}
 
