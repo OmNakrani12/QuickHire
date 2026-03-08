@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Briefcase, Mail, Lock, User, Loader2 } from "lucide-react";
+import { Briefcase, Mail, Lock, User, Loader2, Phone} from "lucide-react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, googleProvider } from "../firebase/config";
 import { signInWithPopup } from "firebase/auth";
@@ -19,6 +19,10 @@ export default function SignupPage() {
     const [loading, setLoading] = useState(false);
     const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
+    const validateEmail = (email) => {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email);
+    };
     const handleGoogleSignup = async () => {
         try {
             setLoading(true);
@@ -96,6 +100,14 @@ export default function SignupPage() {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validateEmail(formData.email)) {
+            alert("Please enter a valid email address");
+            return;
+        }
+        if(formData.phone.length > 10){
+            alert("Phone number should not exceed 10 digits");
+            return;
+        }
         if (formData.password !== formData.confirmPassword) {
             alert("Passwords do not match");
             return;
@@ -198,14 +210,14 @@ export default function SignupPage() {
                         <div>
                             <label className="block text-sm font-semibold mb-2">Full Name</label>
                             <div className="relative">
-                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
                                 <input
                                     type="text"
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     className="input pl-11"
-                                    placeholder="John Doe"
+                                    placeholder="Virat Patel"
                                 />
                             </div>
                         </div>
@@ -214,14 +226,14 @@ export default function SignupPage() {
                         <div>
                             <label className="block text-sm font-semibold mb-2">Email Address</label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
                                 <input
                                     type="email"
                                     required
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     className="input pl-11"
-                                    placeholder="john@example.com"
+                                    placeholder="abc@example.com"
                                 />
                             </div>
                         </div>
@@ -229,21 +241,25 @@ export default function SignupPage() {
                         {/* Phone */}
                         <div>
                             <label className="block text-sm font-semibold mb-2">Phone Number</label>
-                            <input
-                                type="tel"
-                                required
-                                value={formData.phone}
-                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                className="input"
-                                placeholder="+1 (555) 000-0000"
-                            />
+                            <div className="relative">
+                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
+                                <input
+                                    type="tel"
+                                    minLength={10}
+                                    maxLength={10}
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    className="input pl-11"
+                                    placeholder="9876543210"
+                                />
+                            </div>
                         </div>
 
                         {/* Password */}
                         <div>
                             <label className="block text-sm font-semibold mb-2">Password</label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
                                 <input
                                     type="password"
                                     required
@@ -259,7 +275,7 @@ export default function SignupPage() {
                         <div>
                             <label className="block text-sm font-semibold mb-2">Confirm Password</label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
                                 <input
                                     type="password"
                                     required

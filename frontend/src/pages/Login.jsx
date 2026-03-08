@@ -46,6 +46,8 @@ export default function Login() {
       );
       const data = await axios.get(`${BASE_URL}/api/users/email/${user.email}`);
       localStorage.setItem("uid", data.data.id);
+      const data1 = await axios.get(`${BASE_URL}/api/${formData.role}s/user/${data.data.id}`);
+      localStorage.setItem("wid", data1.data.id);
       console.log("User ID stored in localStorage:", data.data.id);
     } catch (err) {
       setError(getFriendlyError(err.code));
@@ -130,7 +132,7 @@ export default function Login() {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   className="input pl-11"
-                  placeholder="john@example.com"
+                  placeholder="abc@example.com"
                 />
               </div>
             </div>

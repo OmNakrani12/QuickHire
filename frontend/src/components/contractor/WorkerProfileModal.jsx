@@ -20,6 +20,7 @@ export default function WorkerProfileModal({ worker, onClose, onHire, onMessage 
     const rating = worker.rating ?? 0;
     const experience = worker.experience ?? 0;
     const skills = Array.isArray(worker.skills) ? worker.skills : [];
+    const certifications = Array.isArray(worker.certifications) ? worker.certifications : [];
 
     useEffect(() => {
         document.body.style.overflow = "hidden";
@@ -133,17 +134,36 @@ export default function WorkerProfileModal({ worker, onClose, onHire, onMessage 
                         )}
 
                         {/* Bio */}
-                        {worker.bio && (
+                        {worker.user.bio && (
                             <div>
-                                <h4 className="font-semibold text-secondary-700 mb-2">
+                                <h4 className="font-semibold text-black-700 mb-2">
                                     About Worker
                                 </h4>
                                 <p className="text-secondary-600 text-sm leading-relaxed">
-                                    {worker.bio}
+                                    {worker.user.bio}
                                 </p>
                             </div>
                         )}
-
+                        {/* Certifications */}
+                        {certifications.length > 0 && (
+                            <div>
+                                <h4 className="font-semibold text-black-700 mb-3">
+                                    Certifications & Licenses
+                                </h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {certifications.map((skill, i) => (
+                                        <span
+                                            key={i}
+                                            className="px-3 py-1 bg-secondary-50 text-secondary-600 text-sm rounded-full font-medium"
+                                        >
+                                            {typeof skill === "object"
+                                                ? certifications.name
+                                                : certifications}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

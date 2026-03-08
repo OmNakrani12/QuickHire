@@ -18,8 +18,10 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Loading from "@/Loading";
+import ApplicationsList from "./ApplicationsList";
 
 export default function MyJobPostings({ onNewJobClick }) {
+  const [selectedJob, setSelectedJob] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -74,6 +76,9 @@ export default function MyJobPostings({ onNewJobClick }) {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {selectedJob && (
+        <ApplicationsList JobId={selectedJob} onClose={() => setSelectedJob(null)} />
+      )}
 
       {/* ── PAGE HEADER ───────────────────────────────── */}
       <div className="card p-6">
@@ -131,7 +136,6 @@ export default function MyJobPostings({ onNewJobClick }) {
         </div>
       </div>
 
-      {/* ── EMPTY STATE ───────────────────────────────── */}
       {filtered.length === 0 && (
         <div className="card p-14 text-center">
           <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -146,18 +150,17 @@ export default function MyJobPostings({ onNewJobClick }) {
         </div>
       )}
 
-      {/* ── JOB CARDS ─────────────────────────────────── */}
       <div className="space-y-3">
         {filtered.map((job) => (
           <JobCard
             key={job.id}
             job={job}
             onDelete={() => setDeleteConfirm(job.id)}
+            onViewApplications={() => setSelectedJob(job.id)}
           />
         ))}
       </div>
 
-      {/* ── DELETE CONFIRM ────────────────────────────── */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ backgroundColor: "rgba(15,23,42,0.6)", backdropFilter: "blur(4px)" }}>
@@ -186,8 +189,7 @@ export default function MyJobPostings({ onNewJobClick }) {
   );
 }
 
-/* ─── JobCard ────────────────────────────────────────────── */
-function JobCard({ job, onDelete }) {
+function JobCard({ job, onDelete, onViewApplications }) {
   const isOpen = job.status === "OPEN";
   const statusCfg = isOpen
     ? { badge: "bg-green-100 text-green-700", dot: "bg-green-400", label: "Open" }
@@ -201,11 +203,11 @@ function JobCard({ job, onDelete }) {
 
   return (
     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex items-stretch">
-      {/* accent bar */}
+
       <div className={`w-1.5 shrink-0 ${isOpen ? "bg-gradient-to-b from-primary-500 to-secondary-500" : "bg-slate-200"}`} />
 
       <div className="flex-1 flex flex-col">
-        {/* ── SECTION 1: header ── */}
+
         <div className="flex items-center gap-3 px-5 pt-5 pb-3">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isOpen ? "bg-gradient-to-br from-primary-500 to-secondary-600" : "bg-slate-200"}`}>
             <Briefcase className={`w-5 h-5 ${isOpen ? "text-white" : "text-slate-500"}`} />
@@ -220,7 +222,6 @@ function JobCard({ job, onDelete }) {
           </span>
         </div>
 
-        {/* ── SECTION 2: description + meta + skills ── */}
         <div className="px-5 pb-4 flex flex-col gap-2.5">
           {job.description && (
             <p className="text-sm text-slate-500 leading-relaxed line-clamp-1">{job.description}</p>
@@ -243,7 +244,7 @@ function JobCard({ job, onDelete }) {
 
         {/* ── SECTION 3: footer actions ── */}
         <div className="mt-auto px-5 py-3 border-t border-slate-100 bg-slate-50/50 flex items-center justify-end gap-2">
-          <button className="btn btn-outline py-1.5 px-4 text-sm flex items-center gap-1.5">
+          <button className="btn btn-outline py-1.5 px-4 text-sm flex items-center gap-1.5" onClick={onViewApplications}>
             <Users className="w-3.5 h-3.5" /> Applications
           </button>
           <button onClick={onDelete}

@@ -17,7 +17,6 @@ public class Application {
     @JoinColumn(name = "job_id", nullable = false)
     private Job job;
 
-    @JsonIgnoreProperties({"skills", "certifications"})
     @ManyToOne
     @JoinColumn(name = "worker_id", nullable = false)
     private Worker worker;
