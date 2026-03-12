@@ -6,18 +6,18 @@ export default function ActiveJobs({ jobs }) {
             <h2 className="text-2xl font-bold mb-6">Active Jobs</h2>
             <div className="space-y-4">
                 {jobs.map((job) => (
-                    <div key={job.id} className="p-4 bg-slate-50 rounded-lg">
+                    <div key={job.id} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                         <div className="flex items-start justify-between mb-3">
                             <div>
-                                <h3 className="font-bold text-lg">{job.title}</h3>
-                                <p className="text-slate-600">{job.contractor}</p>
+                                <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100">{job.title}</h3>
+                                <p className="text-slate-600 dark:text-slate-400">{job.contractor}</p>
                             </div>
                             <span className="badge badge-info">{job.status}</span>
                         </div>
                         <div className="mb-3">
                             <div className="flex items-center justify-between text-sm mb-1">
-                                <span className="text-slate-600">Progress</span>
-                                <span className="font-semibold">{job.progress}%</span>
+                                <span className="text-slate-600 dark:text-slate-400">Progress</span>
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">{job.progress}%</span>
                             </div>
                             <div className="w-full bg-slate-200 rounded-full h-2">
                                 <div
@@ -26,7 +26,7 @@ export default function ActiveJobs({ jobs }) {
                                 ></div>
                             </div>
                         </div>
-                        <div className="flex items-center text-sm text-slate-600">
+                        <div className="flex items-center text-sm text-slate-600 dark:text-slate-400">
                             <Calendar className="w-4 h-4 mr-1" />
                             Due: {job.dueDate}
                         </div>

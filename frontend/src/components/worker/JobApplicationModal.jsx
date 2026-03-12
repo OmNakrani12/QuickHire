@@ -73,7 +73,7 @@ export default function JobApplicationModal({ job, onClose }) {
             onClick={handleBackdropClick}
         >
             <div
-                className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-white/20 overflow-hidden"
+                className="relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-white/20 dark:border-slate-700 overflow-hidden"
                 style={{ animation: "modalIn 0.28s cubic-bezier(0.34,1.56,0.64,1) both" }}
             >
                 {/* Gradient header — uses primary-600 (sky blue) */}
@@ -93,19 +93,19 @@ export default function JobApplicationModal({ job, onClose }) {
                 </div>
 
                 {/* Job meta chips */}
-                <div className="flex flex-wrap gap-3 px-6 py-4 bg-primary-50 border-b border-primary-100">
+                <div className="flex flex-wrap gap-3 px-6 py-4 bg-primary-50 dark:bg-primary-900/20 border-b border-primary-100 dark:border-primary-800/50">
                     {job?.location && (
-                        <span className="flex items-center text-xs text-primary-700 bg-white border border-primary-200 px-3 py-1 rounded-full shadow-sm">
+                        <span className="flex items-center text-xs text-primary-700 dark:text-primary-300 bg-white dark:bg-slate-800 border border-primary-200 dark:border-primary-700 px-3 py-1 rounded-full shadow-sm">
                             <MapPin className="w-3.5 h-3.5 mr-1" /> {job.location}
                         </span>
                     )}
                     {job?.duration && (
-                        <span className="flex items-center text-xs text-primary-700 bg-white border border-primary-200 px-3 py-1 rounded-full shadow-sm">
+                        <span className="flex items-center text-xs text-primary-700 dark:text-primary-300 bg-white dark:bg-slate-800 border border-primary-200 dark:border-primary-700 px-3 py-1 rounded-full shadow-sm">
                             <Clock className="w-3.5 h-3.5 mr-1" /> {job.duration}
                         </span>
                     )}
                     {job?.payRate && (
-                        <span className="flex items-center text-xs text-primary-700 bg-white border border-primary-200 px-3 py-1 rounded-full shadow-sm font-semibold">
+                        <span className="flex items-center text-xs text-primary-700 dark:text-primary-300 bg-white dark:bg-slate-800 border border-primary-200 dark:border-primary-700 px-3 py-1 rounded-full shadow-sm font-semibold">
                             <DollarSign className="w-3.5 h-3.5 mr-1" /> ₹{job.payRate} listed
                         </span>
                     )}
@@ -117,10 +117,10 @@ export default function JobApplicationModal({ job, onClose }) {
                         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                             <CheckCircle className="w-9 h-9 text-green-600" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">Application Sent!</h3>
-                        <p className="text-slate-500 text-sm mb-6">
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">Application Sent!</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
                             Your application for{" "}
-                            <span className="font-semibold text-slate-700">{job?.title}</span> has
+                            <span className="font-semibold text-slate-700 dark:text-slate-300">{job?.title}</span> has
                             been submitted. The contractor will review it shortly.
                         </p>
                         <button onClick={onClose} className="btn btn-primary">
@@ -131,7 +131,7 @@ export default function JobApplicationModal({ job, onClose }) {
                     <form onSubmit={handleSubmit} className="p-6 space-y-5">
                         {/* Error banner */}
                         {status === "error" && (
-                            <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
+                            <div className="flex items-start gap-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3 text-sm text-red-700 dark:text-red-300">
                                 <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
                                 <span>{errorMsg}</span>
                             </div>
@@ -139,7 +139,7 @@ export default function JobApplicationModal({ job, onClose }) {
 
                         {/* Cover Note */}
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
                                 <FileText className="w-4 h-4 text-primary-500" />
                                 Cover Note
                             </label>
@@ -149,13 +149,13 @@ export default function JobApplicationModal({ job, onClose }) {
                                 value={form.coverNote}
                                 onChange={handleChange}
                                 placeholder="Introduce yourself and explain why you're a great fit for this job..."
-                                className="input resize-none"
+                                className="input resize-none dark:bg-slate-900/50 dark:border-slate-700 dark:text-slate-100"
                             />
                         </div>
 
                         {/* Proposed Rate */}
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
                                 <DollarSign className="w-4 h-4 text-primary-500" />
                                 Your Proposed Rate (₹/hr)
                             </label>
@@ -166,13 +166,13 @@ export default function JobApplicationModal({ job, onClose }) {
                                 onChange={handleChange}
                                 min={0}
                                 placeholder="e.g. 500"
-                                className="input"
+                                className="input dark:bg-slate-900/50 dark:border-slate-700 dark:text-slate-100"
                             />
                         </div>
 
                         {/* Available From */}
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
                                 <Calendar className="w-4 h-4 text-primary-500" />
                                 Available From
                             </label>
@@ -182,7 +182,7 @@ export default function JobApplicationModal({ job, onClose }) {
                                 value={form.availableFrom}
                                 onChange={handleChange}
                                 min={new Date().toISOString().split("T")[0]}
-                                className="input"
+                                className="input dark:bg-slate-900/50 dark:border-slate-700 dark:text-slate-100"
                             />
                         </div>
 

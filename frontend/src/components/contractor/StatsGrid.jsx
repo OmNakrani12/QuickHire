@@ -43,13 +43,13 @@ export default function StatsGrid({ stats }) {
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
             {cards.map(({ icon, value, label, bg }) => (
-                <div key={label} className="card p-5 flex flex-col gap-3">
+                <div key={label} className="card p-5 flex flex-col gap-3 dark:bg-slate-800 border dark:border-slate-700">
                     <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${bg} flex items-center justify-center shadow-md`}>
                         {icon}
                     </div>
                     <div>
-                        <div className="text-2xl font-bold text-slate-800 leading-tight">{value}</div>
-                        <div className="text-xs text-slate-500 mt-0.5">{label}</div>
+                        <div className="text-2xl font-bold text-slate-800 dark:text-white leading-tight">{value}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{label}</div>
                     </div>
                 </div>
             ))}

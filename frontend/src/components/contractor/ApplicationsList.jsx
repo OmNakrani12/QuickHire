@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Loading from '@/Loading';
 import WorkerProfileModal from './WorkerProfileModal';
+import { useNavigate } from 'react-router-dom';
 
-export default function ApplicationsList({JobId}) {
+export default function ApplicationsList({ JobId, onNavigateToMessages }) {
+    const navigate = useNavigate();
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedWorker, setSelectedWorker] = useState(null);
@@ -13,10 +15,10 @@ export default function ApplicationsList({JobId}) {
         const fetchApplications = async () => {
             try {
                 setLoading(true);
-                const uid = JSON.parse(localStorage.getItem("uid"));
-                
+                const cid = JSON.parse(localStorage.getItem("wid"));
+
                 const res = await axios.get(
-                    `${BASE_URL}/api/jobs/applications/contractor/${uid}`
+                    `${BASE_URL}/api/jobs/applications/contractor/${cid}`
                 );// Set worker profile from the first application (or null if no applications)
                 console.log("Raw applications data:", res.data);
                 const formatted = res.data.map(app => ({
@@ -28,8 +30,8 @@ export default function ApplicationsList({JobId}) {
                     rating: 4.5, // placeholder if not in DB
                     completedJobs: app.worker.experience,
                     skills: app.job.skillsRequired
-                    ? app.job.skillsRequired.split(",")
-                    : [],
+                        ? app.job.skillsRequired.split(",")
+                        : [],
                     appliedDate: app.appliedAt?.split("T")[0],
                 }));
                 console.log("Fetched applications:", formatted);
@@ -37,16 +39,28 @@ export default function ApplicationsList({JobId}) {
             } catch (err) {
                 console.error("Failed to fetch applications:", err);
             }
-            finally{
+            finally {
                 setLoading(false);
             }
         };
         fetchApplications();
-    }, [JobId]);
-    if(loading){
+    }, [JobId, BASE_URL]);
+
+    const handleHire = async (appId) => {
+        try {
+            await axios.put(`${BASE_URL}/api/jobs/applications/${appId}/status`, { status: "ACCEPTED" });
+            setApplications(prev => prev.filter(app => app.id !== appId));
+            alert("Worker hired successfully!");
+        } catch (err) {
+            console.error("Failed to hire worker:", err);
+            alert("Failed to hire worker.");
+        }
+    };
+
+    if (loading) {
         return (
             <div className='flex items-center justify-center'>
-                <Loading text="Fetching applications"/>
+                <Loading text="Fetching applications" />
             </div>
         )
     }
@@ -71,7 +85,7 @@ export default function ApplicationsList({JobId}) {
 
                     <div className="space-y-4">
                         {applications.filter(app => Number(app.jobId) === Number(JobId) || !JobId).map((application) => (
-                            <div key={application.id} className="p-6 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition">
+                            <div key={application.id} className="p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/50 rounded-xl shadow-sm hover:shadow-md transition">
                                 <div className="flex items-start justify-between gap-6">
 
                                     {/* LEFT SECTION */}
@@ -86,12 +100,12 @@ export default function ApplicationsList({JobId}) {
                                         <div className="flex-1">
 
                                             {/* Name */}
-                                            <h3 className="text-lg font-semibold text-slate-800">
+                                            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
                                                 {application.worker.user.name}
                                             </h3>
 
                                             {/* Job */}
-                                            <p className="text-sm text-slate-500 mb-2">
+                                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
                                                 Applied for <span className="font-medium">{application.job}</span>
                                             </p>
 
@@ -99,12 +113,12 @@ export default function ApplicationsList({JobId}) {
                                             <div className="flex items-center gap-4 mb-3">
                                                 <div className="flex items-center text-yellow-500">
                                                     <Star className="w-4 h-4 mr-1" />
-                                                    <span className="font-medium text-slate-700">
+                                                    <span className="font-medium text-slate-700 dark:text-slate-300">
                                                         {application.rating}
                                                     </span>
                                                 </div>
 
-                                                <span className="text-sm text-slate-500">
+                                                <span className="text-sm text-slate-500 dark:text-slate-400">
                                                     {application.completedJobs} yrs experience
                                                 </span>
                                             </div>
@@ -114,7 +128,7 @@ export default function ApplicationsList({JobId}) {
                                                 {application.skills.map((skill, index) => (
                                                     <span
                                                         key={index}
-                                                        className="px-3 py-1 text-xs font-medium bg-primary-50 text-primary-700 rounded-full"
+                                                        className="px-3 py-1 text-xs font-medium bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full"
                                                     >
                                                         {skill}
                                                     </span>
@@ -122,8 +136,8 @@ export default function ApplicationsList({JobId}) {
                                             </div>
 
                                             {/* Cover Note */}
-                                            <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-600">
-                                                <span className="font-medium text-slate-700">
+                                            <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm text-slate-600 dark:text-slate-300">
+                                                <span className="font-medium text-slate-700 dark:text-slate-200">
                                                     Cover Note:
                                                 </span>{" "}
                                                 {application.coverNote || "No cover note provided"}
@@ -139,7 +153,10 @@ export default function ApplicationsList({JobId}) {
                                     {/* RIGHT SECTION BUTTONS */}
                                     <div className="flex flex-col gap-2 w-40">
 
-                                        <button className="btn btn-secondary w-full">
+                                        <button 
+                                            className="btn btn-secondary w-full"
+                                            onClick={() => handleHire(application.id)}
+                                        >
                                             Hire Worker
                                         </button>
 
@@ -150,12 +167,22 @@ export default function ApplicationsList({JobId}) {
                                             View Profile
                                         </button>
 
-                                        <button className="btn btn-outline w-full">
+                                        <button
+                                            className="btn btn-outline w-full"
+                                            onClick={() => {
+                                                if (onNavigateToMessages) {
+                                                    onNavigateToMessages({
+                                                        id: application.worker.user.id,
+                                                        name: application.worker.user.name
+                                                    });
+                                                } else {
+                                                    navigate(`/contractor/messages/${application.worker.id}`);
+                                                }
+                                            }}
+                                        >
                                             Message
                                         </button>
-
                                     </div>
-
                                 </div>
                             </div>
                         ))}
@@ -167,7 +194,7 @@ export default function ApplicationsList({JobId}) {
                     <WorkerProfileModal
                         worker={selectedWorker}
                         onClose={() => setSelectedWorker(null)}
-                        />
+                    />
                 </div>
             )}
         </>

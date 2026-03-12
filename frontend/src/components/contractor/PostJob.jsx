@@ -33,7 +33,7 @@ export default function PostJob() {
     const [myJobs, setMyJobs] = useState([]);
     const [loadingJobs, setLoadingJobs] = useState(false);
     const BASE_URL = import.meta.env.VITE_BACKEND_URL;
-    const cid = localStorage.getItem("uid");
+    const cid = localStorage.getItem("wid");
 
     useEffect(() => {
         fetchMyJobs();

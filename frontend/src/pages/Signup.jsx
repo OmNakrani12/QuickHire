@@ -185,8 +185,8 @@ export default function SignupPage() {
                                     type="button"
                                     onClick={() => setFormData({ ...formData, role: 'worker' })}
                                     className={`p-4 rounded-lg border-2 transition-all ${formData.role === 'worker'
-                                        ? 'border-primary-600 bg-primary-50'
-                                        : 'border-slate-200 hover:border-primary-300'
+                                        ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/30 dark:text-primary-300 dark:border-primary-700'
+                                        : 'border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600'
                                         }`}
                                 >
                                     <User className="w-6 h-6 mx-auto mb-2 text-primary-600" />
@@ -196,8 +196,8 @@ export default function SignupPage() {
                                     type="button"
                                     onClick={() => setFormData({ ...formData, role: 'contractor' })}
                                     className={`p-4 rounded-lg border-2 transition-all ${formData.role === 'contractor'
-                                        ? 'border-secondary-600 bg-secondary-50'
-                                        : 'border-slate-200 hover:border-secondary-300'
+                                        ? 'border-secondary-600 bg-secondary-50 dark:bg-secondary-900/30 dark:text-secondary-300 dark:border-secondary-700'
+                                        : 'border-slate-200 dark:border-slate-700 hover:border-secondary-300 dark:hover:border-secondary-600'
                                         }`}
                                 >
                                     <Briefcase className="w-6 h-6 mx-auto mb-2 text-secondary-600" />
@@ -208,9 +208,9 @@ export default function SignupPage() {
 
                         {/* Name */}
                         <div>
-                            <label className="block text-sm font-semibold mb-2">Full Name</label>
+                            <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Full Name</label>
                             <div className="relative">
-                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="text"
                                     required
@@ -224,9 +224,9 @@ export default function SignupPage() {
 
                         {/* Email */}
                         <div>
-                            <label className="block text-sm font-semibold mb-2">Email Address</label>
+                            <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Email Address</label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="email"
                                     required
@@ -240,9 +240,9 @@ export default function SignupPage() {
 
                         {/* Phone */}
                         <div>
-                            <label className="block text-sm font-semibold mb-2">Phone Number</label>
+                            <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Phone Number</label>
                             <div className="relative">
-                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
+                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="tel"
                                     minLength={10}
@@ -257,9 +257,9 @@ export default function SignupPage() {
 
                         {/* Password */}
                         <div>
-                            <label className="block text-sm font-semibold mb-2">Password</label>
+                            <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Password</label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="password"
                                     required
@@ -273,9 +273,9 @@ export default function SignupPage() {
 
                         {/* Confirm Password */}
                         <div>
-                            <label className="block text-sm font-semibold mb-2">Confirm Password</label>
+                            <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Confirm Password</label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-black-400" />
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="password"
                                     required
@@ -305,17 +305,17 @@ export default function SignupPage() {
                     </form>
 
                     {/* Login Link */}
-                    <p className="text-center mt-6 text-slate-600">
+                    <p className="text-center mt-6 text-slate-600 dark:text-slate-400">
                         Already have an account?{' '}
-                        <Link to="/login" className="text-primary-600 font-semibold hover:underline">
+                        <Link to="/login" className="text-primary-600 dark:text-primary-400 font-semibold hover:underline">
                             Login
                         </Link>
                     </p>
                     {/* Divider */}
                     <div className="flex items-center my-6">
-                        <div className="flex-grow h-px bg-slate-200" />
-                        <span className="px-4 text-sm text-slate-500">OR</span>
-                        <div className="flex-grow h-px bg-slate-200" />
+                        <div className="flex-grow h-px bg-slate-200 dark:bg-slate-700" />
+                        <span className="px-4 text-sm text-slate-500 dark:text-slate-400">OR</span>
+                        <div className="flex-grow h-px bg-slate-200 dark:bg-slate-700" />
                     </div>
 
                     {/* Google Signup */}
@@ -323,7 +323,7 @@ export default function SignupPage() {
                         type="button"
                         onClick={handleGoogleSignup}
                         disabled={loading}
-                        className="w-full flex items-center justify-center gap-3 border border-slate-300 rounded-lg py-3 hover:bg-slate-50 transition font-medium"
+                        className="w-full flex items-center justify-center gap-3 border border-slate-300 dark:border-slate-700 rounded-lg py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition font-medium"
                     >
                         <FcGoogle className="w-5 h-5" />
                         Continue with Google

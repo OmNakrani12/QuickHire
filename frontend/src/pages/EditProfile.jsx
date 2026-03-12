@@ -240,26 +240,26 @@ export default function EditProfile() {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 py-8 px-4">
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="mb-8 animate-slide-down">
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-4xl font-bold gradient-text mb-2">Edit Profile</h1>
-                            <p className="text-slate-600">Update your professional information</p>
+                            <p className="text-slate-600 dark:text-slate-400">Update your professional information</p>
                         </div>
                         <button
                             onClick={handleCancel}
-                            className="p-3 rounded-lg bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                            className="p-3 rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all hover:scale-105"
                         >
-                            <X className="w-6 h-6 text-slate-700" />
+                            <X className="w-6 h-6 text-slate-700 dark:text-slate-300" />
                         </button>
                     </div>
                 </div>
 
                 {/* Profile Photo Section */}
-                <div className="card p-8 mb-6 animate-scale-in">
+                <div className="card dark:bg-slate-900/80 dark:border-slate-800 p-8 mb-6 animate-scale-in">
                     <div className="flex items-center space-x-6">
                         <div className="relative">
                             {photoPreview ? (
@@ -283,14 +283,14 @@ export default function EditProfile() {
                             <button
                                 type="button"
                                 onClick={() => document.getElementById('photo-upload').click()}
-                                className="absolute bottom-0 right-0 p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 border-4 border-white"
+                                className="absolute bottom-0 right-0 p-3 bg-white dark:bg-slate-800 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 border-4 border-white dark:border-slate-800"
                             >
-                                <Camera className="w-5 h-5 text-primary-600" />
+                                <Camera className="w-5 h-5 text-primary-600 dark:text-primary-500" />
                             </button>
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold mb-2">Profile Photo</h3>
-                            <p className="text-slate-600 mb-3">Upload a professional photo to help contractors recognize you</p>
+                            <h3 className="text-xl font-bold mb-2 dark:text-white">Profile Photo</h3>
+                            <p className="text-slate-600 dark:text-slate-400 mb-3">Upload a professional photo to help contractors recognize you</p>
                             <button
                                 type="button"
                                 onClick={() => document.getElementById('photo-upload').click()}
@@ -304,14 +304,14 @@ export default function EditProfile() {
                 </div>
 
                 {/* Personal Information */}
-                <div className="card p-8 mb-6 animate-slide-up">
-                    <h2 className="text-2xl font-bold mb-6 flex items-center">
-                        <User className="w-6 h-6 mr-2 text-primary-600" />
+                <div className="card dark:bg-slate-900/80 dark:border-slate-800 p-8 mb-6 animate-slide-up">
+                    <h2 className="text-2xl font-bold mb-6 flex items-center dark:text-white">
+                        <User className="w-6 h-6 mr-2 text-primary-600 dark:text-primary-500" />
                         Personal Information
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Full Name
                             </label>
                             <input
@@ -319,60 +319,60 @@ export default function EditProfile() {
                                 name="name"
                                 value={formData.name}
                                 onChange={handleInputChange}
-                                className="input"
+                                className="input dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                 placeholder="John Doe"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Email Address
                             </label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleInputChange}
-                                    className="input pl-11"
+                                    className="input pl-11 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                     placeholder="john@example.com"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Phone Number
                             </label>
                             <div className="relative">
-                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="tel"
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleInputChange}
-                                    className="input pl-11"
+                                    className="input pl-11 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                     placeholder="+1 (555) 000-0000"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Location
                             </label>
                             <div className="relative">
-                                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="text"
                                     name="location"
                                     value={formData.location}
                                     onChange={handleInputChange}
-                                    className="input pl-11"
+                                    className="input pl-11 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                     placeholder="New York, NY"
                                 />
                             </div>
                         </div>
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Bio
                             </label>
                             <textarea
@@ -380,7 +380,7 @@ export default function EditProfile() {
                                 value={formData.bio}
                                 onChange={handleInputChange}
                                 rows="4"
-                                className="input resize-none"
+                                className="input resize-none dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                 placeholder="Tell contractors about your experience and what makes you a great worker..."
                             />
                         </div>
@@ -388,55 +388,55 @@ export default function EditProfile() {
                 </div>
 
                 {/* Professional Details */}
-                <div className="card p-8 mb-6 animate-slide-up">
-                    <h2 className="text-2xl font-bold mb-6 flex items-center">
-                        <Briefcase className="w-6 h-6 mr-2 text-primary-600" />
+                <div className="card dark:bg-slate-900/80 dark:border-slate-800 p-8 mb-6 animate-slide-up">
+                    <h2 className="text-2xl font-bold mb-6 flex items-center dark:text-white">
+                        <Briefcase className="w-6 h-6 mr-2 text-primary-600 dark:text-primary-500" />
                         Professional Details
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Hourly Rate
                             </label>
                             <div className="relative">
-                                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="number"
                                     name="hourlyRate"
                                     value={formData.hourlyRate}
                                     onChange={handleInputChange}
                                     onWheel={(e) => e.target.blur()}
-                                    className="input pl-11"
+                                    className="input pl-11 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                     placeholder="25"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Years of Experience
                             </label>
                             <div className="relative">
-                                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="number"
                                     name="experience"
                                     value={formData.experience}
                                     onChange={handleInputChange}
                                     onWheel={(e) => e.target.blur()}
-                                    className="input pl-11"
+                                    className="input pl-11 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                     placeholder="5"
                                 />
                             </div>
                         </div>
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Availability
                             </label>
                             <select
                                 name="availability"
                                 value={formData.availability}
                                 onChange={handleInputChange}
-                                className="input"
+                                className="input dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                             >
                                 <option value="full-time">Full-time</option>
                                 <option value="part-time">Part-time</option>
@@ -448,9 +448,9 @@ export default function EditProfile() {
                 </div>
 
                 {/* Skills Section */}
-                <div className="card p-8 mb-6 animate-slide-up">
-                    <h2 className="text-2xl font-bold mb-6 flex items-center">
-                        <Award className="w-6 h-6 mr-2 text-primary-600" />
+                <div className="card dark:bg-slate-900/80 dark:border-slate-800 p-8 mb-6 animate-slide-up">
+                    <h2 className="text-2xl font-bold mb-6 flex items-center dark:text-white">
+                        <Award className="w-6 h-6 mr-2 text-primary-600 dark:text-primary-500" />
                         Skills
                     </h2>
                     <div className="mb-4">
@@ -460,7 +460,7 @@ export default function EditProfile() {
                                 value={newSkill}
                                 onChange={(e) => setNewSkill(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleAddSkill()}
-                                className="input flex-1"
+                                className="input flex-1 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                 placeholder="Add a skill (e.g., Welding, Carpentry)"
                             />
                             <button
@@ -475,12 +475,12 @@ export default function EditProfile() {
                         {formData.skills.map((skill, index) => (
                             <div
                                 key={index}
-                                className="badge badge-info flex items-center gap-2 px-4 py-2 text-base"
+                                className="badge badge-info flex items-center gap-2 px-4 py-2 text-base dark:bg-primary-900/30 dark:text-primary-300 dark:border-primary-800/50"
                             >
                                 {skill}
                                 <button
                                     onClick={() => handleRemoveSkill(skill)}
-                                    className="hover:text-red-600 transition-colors"
+                                    className="hover:text-red-500 transition-colors"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
@@ -490,9 +490,9 @@ export default function EditProfile() {
                 </div>
 
                 {/* Certifications Section */}
-                <div className="card p-8 mb-6 animate-slide-up">
-                    <h2 className="text-2xl font-bold mb-6 flex items-center">
-                        <FileText className="w-6 h-6 mr-2 text-primary-600" />
+                <div className="card dark:bg-slate-900/80 dark:border-slate-800 p-8 mb-6 animate-slide-up">
+                    <h2 className="text-2xl font-bold mb-6 flex items-center dark:text-white">
+                        <FileText className="w-6 h-6 mr-2 text-primary-600 dark:text-primary-500" />
                         Certifications
                     </h2>
                     <div className="mb-4">
@@ -502,7 +502,7 @@ export default function EditProfile() {
                                 value={newCertification}
                                 onChange={(e) => setNewCertification(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleAddCertification()}
-                                className="input flex-1"
+                                className="input flex-1 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                 placeholder="Add a certification (e.g., OSHA Safety Certified)"
                             />
                             <button
@@ -517,17 +517,17 @@ export default function EditProfile() {
                         {formData.certifications.map((cert, index) => (
                             <div
                                 key={index}
-                                className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                                className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 border dark:border-slate-700 transition-colors"
                             >
                                 <div className="flex items-center">
-                                    <Award className="w-5 h-5 text-green-600 mr-3" />
-                                    <span className="font-medium">{cert}</span>
+                                    <Award className="w-5 h-5 text-green-600 dark:text-green-500 mr-3" />
+                                    <span className="font-medium dark:text-slate-200">{cert}</span>
                                 </div>
                                 <button
                                     onClick={() => handleRemoveCertification(cert)}
-                                    className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                    className="p-2 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                                 >
-                                    <Trash2 className="w-4 h-4 text-red-600" />
+                                    <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
                                 </button>
                             </div>
                         ))}

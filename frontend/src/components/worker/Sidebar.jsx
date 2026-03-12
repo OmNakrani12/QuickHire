@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 import {
     Briefcase,
     Home,
@@ -7,13 +8,13 @@ import {
     User,
     MessageSquare,
     Settings,
-    LogOut,
     Wallet,
 } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
+    const { t } = useLanguage();
     return (
-        <aside className="w-64 bg-white/80 backdrop-blur-md border-r border-white/20 fixed h-full">
+        <aside className="w-64 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-r border-slate-200 dark:border-slate-800 fixed h-full z-10 transition-colors duration-300">
             <div className="p-6">
                 <Link to="/" className="flex items-center space-x-2 mb-8">
                     <Briefcase className="w-8 h-8 text-primary-600" />
@@ -24,88 +25,80 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                     <button
                         onClick={() => setActiveTab('dashboard')}
                         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'dashboard'
-                                ? 'bg-primary-600 text-white shadow-lg'
-                                : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-primary-600 text-white shadow-lg'
+                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/50'
                             }`}
                     >
                         <Home className="w-5 h-5" />
-                        <span className="font-medium">Dashboard</span>
+                        <span className="font-medium">{t('dashboard')}</span>
                     </button>
 
                     <button
                         onClick={() => setActiveTab('jobs')}
                         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'jobs'
-                                ? 'bg-primary-600 text-white shadow-lg'
-                                : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-primary-600 text-white shadow-lg'
+                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/50'
                             }`}
                     >
                         <Search className="w-5 h-5" />
-                        <span className="font-medium">Find Jobs</span>
+                        <span className="font-medium">{t('findJobs')}</span>
                     </button>
 
                     <button
                         onClick={() => setActiveTab('active')}
                         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'active'
-                                ? 'bg-primary-600 text-white shadow-lg'
-                                : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-primary-600 text-white shadow-lg'
+                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/50'
                             }`}
                     >
                         <FileText className="w-5 h-5" />
-                        <span className="font-medium">Active Jobs</span>
+                        <span className="font-medium">{t('activeJobs')}</span>
                     </button>
 
                     <button
                         onClick={() => setActiveTab('earnings')}
                         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'earnings'
-                                ? 'bg-primary-600 text-white shadow-lg'
-                                : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-primary-600 text-white shadow-lg'
+                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/50'
                             }`}
                     >
                         <Wallet className="w-5 h-5" />
-                        <span className="font-medium">Earnings</span>
+                        <span className="font-medium">{t('earnings')}</span>
                     </button>
 
                     <button
                         onClick={() => setActiveTab('messages')}
                         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'messages'
-                                ? 'bg-primary-600 text-white shadow-lg'
-                                : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-primary-600 text-white shadow-lg'
+                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/50'
                             }`}
                     >
                         <MessageSquare className="w-5 h-5" />
-                        <span className="font-medium">Messages</span>
+                        <span className="font-medium">{t('messages')}</span>
                     </button>
 
                     <button
                         onClick={() => setActiveTab('profile')}
                         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'profile'
-                                ? 'bg-primary-600 text-white shadow-lg'
-                                : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-primary-600 text-white shadow-lg'
+                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/50'
                             }`}
                     >
                         <User className="w-5 h-5" />
-                        <span className="font-medium">Profile</span>
+                        <span className="font-medium">{t('profile')}</span>
                     </button>
 
                     <button
                         onClick={() => setActiveTab('settings')}
                         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'settings'
-                                ? 'bg-primary-600 text-white shadow-lg'
-                                : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-primary-600 text-white shadow-lg'
+                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/50'
                             }`}
                     >
                         <Settings className="w-5 h-5" />
-                        <span className="font-medium">Settings</span>
+                        <span className="font-medium">{t('settings')}</span>
                     </button>
                 </nav>
-
-                <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-all mt-8"
-                >
-                    <LogOut className="w-5 h-5" />
-                    <span className="font-medium">Logout</span>
-                </button>
             </div>
         </aside>
     );

@@ -18,9 +18,9 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Loading from "@/Loading";
-import ApplicationsList from "./ApplicationsList";
+import JobApplicationsModal from "./JobApplicationsModal";
 
-export default function MyJobPostings({ onNewJobClick }) {
+export default function MyJobPostings({ onNewJobClick, onNavigateToMessages }) {
   const [selectedJob, setSelectedJob] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ export default function MyJobPostings({ onNewJobClick }) {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  const cid = localStorage.getItem("uid");
+  const cid = localStorage.getItem("wid");
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => { fetchJobs(); }, []);
@@ -77,9 +77,17 @@ export default function MyJobPostings({ onNewJobClick }) {
   return (
     <div className="space-y-6 animate-fade-in">
       {selectedJob && (
-        <ApplicationsList JobId={selectedJob} onClose={() => setSelectedJob(null)} />
+        <div
+          className="fixed inset-0 z-50 h-screen p-4 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm"
+          onClick={() => setSelectedJob(null)}
+        >
+          <JobApplicationsModal
+            JobId={selectedJob}
+            onClose={() => setSelectedJob(null)}
+            onNavigateToMessages={onNavigateToMessages}
+          />
+        </div>
       )}
-
       {/* ── PAGE HEADER ───────────────────────────────── */}
       <div className="card p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -120,14 +128,14 @@ export default function MyJobPostings({ onNewJobClick }) {
               onClick={() => setStatusFilter(s)}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${statusFilter === s
                 ? "bg-secondary-600 text-white shadow-md"
-                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700/50 dark:text-slate-300 dark:hover:bg-slate-700"
                 }`}
             >
               {s === "OPEN" && <CheckCircle2 className="w-3.5 h-3.5" />}
               {s === "CLOSED" && <XCircle className="w-3.5 h-3.5" />}
               {s === "ALL" && <Layers className="w-3.5 h-3.5" />}
               {s}
-              <span className={`text-xs px-1.5 py-0.5 rounded-full ml-0.5 ${statusFilter === s ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+              <span className={`text-xs px-1.5 py-0.5 rounded-full ml-0.5 ${statusFilter === s ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300"
                 }`}>
                 {counts[s]}
               </span>
@@ -137,9 +145,9 @@ export default function MyJobPostings({ onNewJobClick }) {
       </div>
 
       {filtered.length === 0 && (
-        <div className="card p-14 text-center">
-          <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Briefcase className="w-8 h-8 text-slate-400" />
+        <div className="card p-14 text-center dark:bg-slate-800/50">
+          <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700/50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Briefcase className="w-8 h-8 text-slate-400 dark:text-slate-500" />
           </div>
           <p className="text-slate-600 font-semibold">No jobs found</p>
           <p className="text-slate-400 text-sm mt-1">
@@ -164,12 +172,12 @@ export default function MyJobPostings({ onNewJobClick }) {
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ backgroundColor: "rgba(15,23,42,0.6)", backdropFilter: "blur(4px)" }}>
-          <div className="bg-white rounded-2xl shadow-2xl p-7 w-full max-w-sm text-center">
-            <div className="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white dark:bg-slate-800 dark:border dark:border-slate-700 rounded-2xl shadow-2xl p-7 w-full max-w-sm text-center">
+            <div className="w-14 h-14 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="w-7 h-7 text-red-500" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-1">Delete Job Posting?</h3>
-            <p className="text-slate-500 text-sm mb-6">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">Delete Job Posting?</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
               This will permanently remove the job and all its applications.
             </p>
             <div className="flex gap-3">
@@ -192,8 +200,8 @@ export default function MyJobPostings({ onNewJobClick }) {
 function JobCard({ job, onDelete, onViewApplications }) {
   const isOpen = job.status === "OPEN";
   const statusCfg = isOpen
-    ? { badge: "bg-green-100 text-green-700", dot: "bg-green-400", label: "Open" }
-    : { badge: "bg-slate-100 text-slate-500", dot: "bg-slate-400", label: "Closed" };
+    ? { badge: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400", dot: "bg-green-400", label: "Open" }
+    : { badge: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400", dot: "bg-slate-400 dark:bg-slate-500", label: "Closed" };
   const postedDate = job.createdAt
     ? new Date(job.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
     : null;
@@ -202,19 +210,19 @@ function JobCard({ job, onDelete, onViewApplications }) {
     : [];
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex items-stretch">
+    <div className="bg-white dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex items-stretch">
 
-      <div className={`w-1.5 shrink-0 ${isOpen ? "bg-gradient-to-b from-primary-500 to-secondary-500" : "bg-slate-200"}`} />
+      <div className={`w-1.5 shrink-0 ${isOpen ? "bg-gradient-to-b from-primary-500 to-secondary-500" : "bg-slate-200 dark:bg-slate-700"}`} />
 
       <div className="flex-1 flex flex-col">
 
         <div className="flex items-center gap-3 px-5 pt-5 pb-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isOpen ? "bg-gradient-to-br from-primary-500 to-secondary-600" : "bg-slate-200"}`}>
-            <Briefcase className={`w-5 h-5 ${isOpen ? "text-white" : "text-slate-500"}`} />
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isOpen ? "bg-gradient-to-br from-primary-500 to-secondary-600" : "bg-slate-200 dark:bg-slate-700"}`}>
+            <Briefcase className={`w-5 h-5 ${isOpen ? "text-white" : "text-slate-500 dark:text-slate-400"}`} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-slate-800 text-base leading-tight truncate">{job.title}</h3>
-            {postedDate && <p className="text-xs text-slate-400 mt-0.5">Posted {postedDate}</p>}
+            <h3 className="font-bold text-slate-800 dark:text-gray-100 text-base leading-tight truncate">{job.title}</h3>
+            {postedDate && <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Posted {postedDate}</p>}
           </div>
           <span className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ${statusCfg.badge}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
@@ -224,7 +232,7 @@ function JobCard({ job, onDelete, onViewApplications }) {
 
         <div className="px-5 pb-4 flex flex-col gap-2.5">
           {job.description && (
-            <p className="text-sm text-slate-500 leading-relaxed line-clamp-1">{job.description}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-1">{job.description}</p>
           )}
           <div className="flex flex-wrap gap-2">
             {job.location && <MetaChip icon={<MapPin className="w-3.5 h-3.5 text-primary-400" />} value={job.location} />}
@@ -243,7 +251,7 @@ function JobCard({ job, onDelete, onViewApplications }) {
         </div>
 
         {/* ── SECTION 3: footer actions ── */}
-        <div className="mt-auto px-5 py-3 border-t border-slate-100 bg-slate-50/50 flex items-center justify-end gap-2">
+        <div className="mt-auto px-5 py-3 border-t border-slate-100 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-end gap-2">
           <button className="btn btn-outline py-1.5 px-4 text-sm flex items-center gap-1.5" onClick={onViewApplications}>
             <Users className="w-3.5 h-3.5" /> Applications
           </button>
@@ -261,9 +269,9 @@ function JobCard({ job, onDelete, onViewApplications }) {
 /* ─── MetaChip ───────────────────────────────────────────── */
 function MetaChip({ icon, value }) {
   return (
-    <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-100 rounded-lg px-2.5 py-1.5">
+    <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-lg px-2.5 py-1.5">
       <span className="shrink-0">{icon}</span>
-      <span className="text-xs text-slate-600 font-medium">{value}</span>
+      <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">{value}</span>
     </div>
   );
 }

@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-900 font-sans;
+    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-slate-50 font-sans transition-colors duration-300;
     min-height: 100vh;
   }
 }
@@ -29,11 +29,11 @@
   }
 
   .card {
-    @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02];
+    @apply bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-slate-700/50 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02];
   }
 
   .input {
-    @apply w-full px-4 py-3 rounded-lg border-2 border-slate-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 transition-all duration-200 bg-white/50 backdrop-blur-sm;
+    @apply w-full px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 transition-all duration-200 bg-white/50 dark:bg-slate-900/50 dark:text-white backdrop-blur-sm placeholder:text-slate-400 dark:placeholder:text-slate-500;
   }
 
   .gradient-text {

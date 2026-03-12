@@ -29,7 +29,7 @@ export default function NewJobModal({ isOpen, onClose }) {
         e.preventDefault();
 
         try {
-            const cid = await localStorage.getItem("uid") || 1; // ⚠ Replace with logged-in contractor ID
+            const cid = await localStorage.getItem("wid") || 1; // ⚠ Replace with logged-in contractor ID
             await axios.post(`${BASE_URL}/api/jobs`, {
                 ...jobData,
                 contractor: {id : cid}, // ⚠ Replace with logged-in contractor ID

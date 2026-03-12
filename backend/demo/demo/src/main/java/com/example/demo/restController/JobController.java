@@ -116,4 +116,28 @@
             }
             return ResponseEntity.ok(applications);
         }
+
+        // ── Update application status (Hire/Reject) ──────────────────────────────
+        @PutMapping("/applications/{applicationId}/status")
+        public ResponseEntity<?> updateApplicationStatus(
+                @PathVariable Long applicationId,
+                @RequestBody Map<String, String> body) {
+            
+            String status = body.get("status");
+            if (status == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Status is required"));
+            }
+
+            return applicationRepository.findById(applicationId).map(app -> {
+                app.setStatus(status);
+                applicationRepository.save(app);
+                
+                // TODO: Here we will later trigger a dynamic notification to the worker
+                
+                return ResponseEntity.ok(Map.of(
+                    "message", "Application status updated to " + status,
+                    "application", app
+                ));
+            }).orElse(ResponseEntity.notFound().build());
+        }
     }

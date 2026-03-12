@@ -3,28 +3,33 @@ import { Client } from "@stomp/stompjs";
 import axios from "axios";
 import { Send, MessageSquare, Circle, ChevronLeft } from "lucide-react";
 
-// Mock contacts — replace with API when ready
-const mockContacts = [
-    { id: 1, name: "BuildCo Inc.", lastMessage: "Looking forward to having you!", unread: 2 },
-    { id: 2, name: "HomeWorks LLC", lastMessage: "Can you start Monday?", unread: 0 },
-    { id: 3, name: "Quick Fix Solutions", lastMessage: "Interview tomorrow at 10am", unread: 1 },
-];
 
 export default function ChatWindow({
-    currentUserId = 4,
-    otherUserId: initialOtherUserId = 1,
-    otherUserName: initialOtherUserName = "User",
+    currentUserId: propsUserId,
+    otherUserId: propsOtherUserId,
+    otherUserName: propsOtherUserName,
+    contact = null,
     theme = "worker",
 }) {
-    const [contacts, setContacts] = useState(mockContacts);
+    const defaultUid = Number(localStorage.getItem("uid"));
+    const currentUserId = propsUserId || defaultUid;
+
+    const [contacts, setContacts] = useState(contact ? [contact] : []);
     const [activeContact, setActiveContact] = useState({
-        id: initialOtherUserId,
-        name: initialOtherUserName,
+        id: propsOtherUserId || null,
+        name: propsOtherUserName || "",
     });
+    const activeContactRef = useRef(activeContact);
+
+    useEffect(() => {
+        activeContactRef.current = activeContact;
+    }, [activeContact]);
+
     const [showContacts, setShowContacts] = useState(true);
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
     const [connected, setConnected] = useState(false);
+
     const clientRef = useRef(null);
     const messagesEndRef = useRef(null);
     const BASE_URL = import.meta.env.VITE_BACKEND_URL;
@@ -53,11 +58,18 @@ export default function ChatWindow({
                 unread: c.unreadCount,
             }));
             setContacts(fetchedContacts);
+
+            // Auto-select first contact if none active
+            if (!activeContact.id && fetchedContacts.length > 0) {
+                setActiveContact({ id: fetchedContacts[0].id, name: fetchedContacts[0].name });
+                setShowContacts(false);
+            }
         } catch (error) {
             console.error("Error loading contacts", error);
         }
     };
     const connectWebSocket = () => {
+        if (!currentUserId) return;
         const stompClient = new Client({
             brokerURL: BASE_URL.replace(/^http/, "ws") + "/ws",
             reconnectDelay: 5000,
@@ -65,7 +77,13 @@ export default function ChatWindow({
                 setConnected(true);
                 stompClient.subscribe(`/topic/messages/${currentUserId}`, (message) => {
                     const received = JSON.parse(message.body);
-                    setMessages((prev) => [...prev, received]);
+                    // Only append to messages if it belongs to the active conversation
+                    const activeId = activeContactRef.current?.id;
+                    if (activeId && (received.senderId === activeId || received.receiverId === activeId)) {
+                        setMessages((prev) => [...prev, received]);
+                    }
+                    // Refresh contacts to update last message and unread count
+                    loadContacts();
                 });
             },
             onWebSocketError: (err) => console.error("WebSocket error:", err),
@@ -76,7 +94,7 @@ export default function ChatWindow({
     };
 
     const sendMessage = () => {
-        if (!text.trim()) return;
+        if (!text.trim() || !activeContact.id) return;
         const client = clientRef.current;
         if (!client?.connected) return;
 
@@ -88,13 +106,22 @@ export default function ChatWindow({
         client.publish({ destination: "/app/chat.send", body: JSON.stringify(message) });
         setMessages((prev) => [...prev, message]);
         setText("");
+        loadContacts();
     };
 
+    // 1. Manage WebSocket connection and Contacts (depends on currentUserId only)
     useEffect(() => {
+        if (!currentUserId) return;
         loadContacts();
-        loadMessages();
         connectWebSocket();
         return () => clientRef.current?.deactivate();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentUserId]);
+
+    // 2. Load messages when active contact changes
+    useEffect(() => {
+        if (!currentUserId || !activeContact.id) return;
+        loadMessages();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentUserId, activeContact.id]);
 
@@ -110,12 +137,12 @@ export default function ChatWindow({
 
     const receivedBubbleCls =
         theme === "worker"
-            ? "bg-primary-50 text-slate-800 rounded-bl-none border border-primary-100"
-            : "bg-slate-100 text-slate-800 rounded-bl-none";
+            ? "bg-primary-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-none border border-primary-100 dark:border-slate-700"
+            : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-none border border-transparent dark:border-slate-700";
 
     return (
         <div
-            className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden animate-fade-in flex flex-col"
+            className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-slate-800 overflow-hidden animate-fade-in flex flex-col"
             style={{ height: "calc(100vh - 10rem)" }}
         >
             <div className="flex flex-1 min-h-0 h-full">
@@ -123,7 +150,7 @@ export default function ChatWindow({
                 {/* ── Contacts sidebar ─────────────────────────────────────────── */}
                 <div
                     className={`${showContacts ? "flex" : "hidden md:flex"
-                        } flex-col w-full md:w-72 border-r border-slate-100 shrink-0 h-full min-h-0`}
+                        } flex-col w-full md:w-72 border-r border-slate-100 dark:border-slate-800 shrink-0 h-full min-h-0`}
                 >
                     {/* Sidebar header */}
                     <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-4">
@@ -147,8 +174,8 @@ export default function ChatWindow({
                                         setActiveContact({ id: contact.id, name: contact.name });
                                         setShowContacts(false);
                                     }}
-                                    className={`w-full text-left px-4 py-3.5 transition-all hover:bg-primary-50 ${isActive
-                                        ? "bg-primary-50 border-l-4 border-primary-600"
+                                    className={`w-full text-left px-4 py-3.5 transition-all hover:bg-primary-50 dark:hover:bg-slate-800/50 ${isActive
+                                        ? "bg-primary-50 dark:bg-slate-800 border-l-4 border-primary-600"
                                         : "border-l-4 border-transparent"
                                         }`}
                                 >
@@ -158,7 +185,7 @@ export default function ChatWindow({
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between">
-                                                <span className="font-semibold text-sm text-slate-700 truncate">
+                                                <span className="font-semibold text-sm text-slate-700 dark:text-slate-200 truncate">
                                                     {contact.name}
                                                 </span>
                                                 {contact.unread > 0 && (
@@ -192,11 +219,11 @@ export default function ChatWindow({
                         </button>
 
                         <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm">
-                            {activeContact.name.charAt(0)}
+                            {activeContact.name ? activeContact.name.charAt(0) : "?"}
                         </div>
 
                         <div>
-                            <div className="font-bold text-white text-sm">{activeContact.name}</div>
+                            <div className="font-bold text-white text-sm">{activeContact.name || "Select a contact"}</div>
                             <div className="text-primary-100 text-xs flex items-center gap-1">
                                 <Circle className="w-2 h-2 fill-green-300 text-green-300" />
                                 {connected ? "Online" : "Connecting…"}
@@ -205,10 +232,10 @@ export default function ChatWindow({
                     </div>
 
                     {/* Messages area */}
-                    <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 bg-slate-50/60">
+                    <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 bg-slate-50/60 dark:bg-slate-900/40">
                         {messages.length === 0 && (
-                            <div className="flex flex-col items-center justify-center h-full text-slate-400 text-sm py-16">
-                                <MessageSquare className="w-10 h-10 mb-3 opacity-30" />
+                            <div className="flex flex-col items-center justify-center h-full text-slate-400 dark:text-slate-500 text-sm py-16">
+                                <MessageSquare className="w-10 h-10 mb-3 opacity-30 text-primary-300 dark:text-slate-600" />
                                 No messages yet. Say hello!
                             </div>
                         )}
@@ -237,10 +264,10 @@ export default function ChatWindow({
                     </div>
 
                     {/* Input bar */}
-                    <div className="px-5 py-4 bg-white border-t border-slate-100 flex items-center gap-3">
+                    <div className="px-5 py-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
                         <input
                             type="text"
-                            className="input flex-1"
+                            className="input flex-1 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                             placeholder="Type your message…"
                             value={text}
                             onChange={(e) => setText(e.target.value)}
@@ -248,7 +275,7 @@ export default function ChatWindow({
                         />
                         <button
                             onClick={sendMessage}
-                            disabled={!connected}
+                            disabled={!connected || !activeContact.id}
                             className="btn btn-primary flex items-center gap-2"
                         >
                             <Send className="w-4 h-4" />

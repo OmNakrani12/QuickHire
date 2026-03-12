@@ -5,7 +5,7 @@ export default function Home() {
     return (
         <div className="min-h-screen">
             {/* Navigation */}
-            <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md shadow-lg z-50 border-b border-white/20">
+            <nav className="fixed top-0 w-full dark:bg-slate-800 bg-white/80 backdrop-blur-md shadow-lg z-50 border-b border-white/20">
                 <div className="max-w-7xl mx-auto px-6 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
@@ -13,7 +13,7 @@ export default function Home() {
                             <span className="text-2xl font-bold gradient-text">QuickHire</span>
                         </div>
                         <div className="flex items-center space-x-4">
-                            <Link to="/login" className="text-slate-700 hover:text-primary-600 font-medium transition-colors">
+                            <Link to="/login" className="dark:text-slate-100 hover:text-primary-600 font-medium transition-colors">
                                 Login
                             </Link>
                             <Link to="/signup" className="btn btn-primary">
@@ -65,7 +65,7 @@ export default function Home() {
             </section>
 
             {/* Features Section */}
-            <section className="py-20 px-6 bg-white/40">
+            <section className="py-20 px-6 bg-slate-600/10">
                 <div className="max-w-7xl mx-auto">
                     <h2 className="text-4xl font-bold text-center mb-16">
                         Why Choose <span className="gradient-text">QuickHire</span>?

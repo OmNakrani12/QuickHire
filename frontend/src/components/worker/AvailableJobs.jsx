@@ -75,13 +75,13 @@ export default function AvailableJobs() {
           </div>
 
           {/* Search bar */}
-          <div className="bg-white/80 backdrop-blur-sm px-6 py-4 flex gap-3 border-b border-slate-100">
+          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm px-6 py-4 flex gap-3 border-b border-slate-100 dark:border-slate-800">
             <input
               type="text"
               value={query}
               onChange={handleSearch}
               placeholder="Search by title, location or skill…"
-              className="input flex-1"
+              className="input flex-1 dark:bg-slate-800/50 dark:border-slate-700/50 dark:text-slate-100"
             />
             <button className="btn btn-primary">
               <Search className="w-5 h-5" />
@@ -100,17 +100,17 @@ export default function AvailableJobs() {
           {filtered.map((job) => (
             <div
               key={job.id}
-              className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-white/20
-                         hover:shadow-xl hover:border-primary-100 transition-all duration-300 overflow-hidden"
+              className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-md border border-white/20 dark:border-slate-700/50
+                         hover:shadow-xl dark:hover:shadow-slate-900/50 hover:border-primary-100 dark:hover:border-primary-900/50 transition-all duration-300 overflow-hidden"
             >
               {/* Top: title + pay */}
               <div className="flex items-start justify-between px-6 pt-5 pb-4">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-xl font-bold text-slate-800 mb-1 truncate">{job.title}</h3>
-                  <p className="text-sm text-slate-500 mb-3">
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1 truncate">{job.title}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
                     {job.contractor?.name || "Unknown Contractor"}
                   </p>
-                  <div className="flex flex-wrap gap-3 text-sm text-slate-600">
+                  <div className="flex flex-wrap gap-3 text-sm text-slate-600 dark:text-slate-400">
                     {job.location && (
                       <span className="flex items-center">
                         <MapPin className="w-4 h-4 mr-1 text-primary-500" />
@@ -127,11 +127,11 @@ export default function AvailableJobs() {
                 </div>
 
                 <div className="text-right ml-4 shrink-0">
-                  <div className="text-2xl font-bold text-primary-600">
+                  <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                     ₹{job.payRate}
-                    <span className="text-sm text-slate-400 font-normal">/hr</span>
+                    <span className="text-sm text-slate-400 dark:text-slate-500 font-normal">/hr</span>
                   </div>
-                  <div className="text-xs text-slate-400 mt-1">
+                  <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                     {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : ""}
                   </div>
                 </div>
@@ -144,7 +144,7 @@ export default function AvailableJobs() {
                     ? job.skillsRequired.split(",").map((skill, idx) => (
                       <span
                         key={idx}
-                        className="text-xs px-3 py-1 bg-primary-50 text-primary-700 border border-primary-100 rounded-full font-medium"
+                        className="text-xs px-3 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-100 dark:border-primary-800/50 rounded-full font-medium"
                       >
                         {skill.trim()}
                       </span>

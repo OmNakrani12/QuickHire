@@ -36,8 +36,8 @@ export default function ProfileView() {
 
   if (!user) {
     return (
-      <div className="card p-8 text-center">
-        <p className="text-slate-500">Loading profile...</p>
+      <div className="card p-8 text-center dark:bg-slate-900/80 dark:border-slate-800">
+        <p className="text-slate-500 dark:text-slate-400">Loading profile...</p>
       </div>
     );
   }
@@ -46,7 +46,7 @@ export default function ProfileView() {
     <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
 
       {/* ================= HEADER ================= */}
-      <div className="card p-8 shadow-md rounded-2xl">
+      <div className="card p-8 shadow-md rounded-2xl dark:bg-slate-900/80 dark:border-slate-800">
         <div className="flex items-start justify-between">
 
           <div className="flex items-start space-x-6">
@@ -66,25 +66,25 @@ export default function ProfileView() {
             <div>
               {/* Name + Verified */}
               <div className="flex items-center gap-3">
-                <h2 className="text-3xl font-bold">
+                <h2 className="text-3xl font-bold dark:text-white">
                   {user.name}
                 </h2>
 
-                <span className="flex items-center bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                <span className="flex items-center bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-3 py-1 rounded-full text-sm font-medium">
                   <CheckCircle className="w-4 h-4 mr-1" />
                   Verified
                 </span>
               </div>
 
-              <p className="text-slate-600 mt-1">{user.email}</p>
+              <p className="text-slate-600 dark:text-slate-400 mt-1">{user.email}</p>
 
               {/* Rating */}
               <div className="flex items-center mt-3">
                 <Star className="w-5 h-5 text-yellow-500 mr-1" />
-                <span className="font-semibold text-lg">
+                <span className="font-semibold text-lg dark:text-slate-200">
                   {user.rating || 4.8}
                 </span>
-                <span className="text-slate-500 ml-2">
+                <span className="text-slate-500 dark:text-slate-400 ml-2">
                   ({user.completedJobs || 12} completed jobs)
                 </span>
               </div>
@@ -102,9 +102,9 @@ export default function ProfileView() {
       </div>
 
       {/* ================= SKILLS ================= */}
-      <div className="card p-8 rounded-2xl shadow-sm">
-        <h3 className="text-xl font-bold mb-5 flex items-center">
-          <Award className="w-5 h-5 mr-2 text-primary-600" />
+      <div className="card p-8 rounded-2xl shadow-sm dark:bg-slate-900/80 dark:border-slate-800">
+        <h3 className="text-xl font-bold mb-5 flex items-center dark:text-white">
+          <Award className="w-5 h-5 mr-2 text-primary-600 dark:text-primary-500" />
           Skills
         </h3>
 
@@ -113,21 +113,21 @@ export default function ProfileView() {
             user.skills.map((skill, index) => (
               <span
                 key={index}
-                className="px-4 py-2 bg-primary-50 text-primary-700 rounded-full font-medium text-sm shadow-sm"
+                className="px-4 py-2 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full font-medium text-sm shadow-sm"
               >
                 {skill}
               </span>
             ))
           ) : (
-            <p className="text-slate-500">No skills added yet</p>
+            <p className="text-slate-500 dark:text-slate-400">No skills added yet</p>
           )}
         </div>
       </div>
 
       {/* ================= CERTIFICATIONS ================= */}
-      <div className="card p-8 rounded-2xl shadow-sm">
-        <h3 className="text-xl font-bold mb-5 flex items-center">
-          <CheckCircle className="w-5 h-5 mr-2 text-green-600" />
+      <div className="card p-8 rounded-2xl shadow-sm dark:bg-slate-900/80 dark:border-slate-800">
+        <h3 className="text-xl font-bold mb-5 flex items-center dark:text-white">
+          <CheckCircle className="w-5 h-5 mr-2 text-green-600 dark:text-green-500" />
           Certifications
         </h3>
 
@@ -136,15 +136,15 @@ export default function ProfileView() {
             {user.certifications.map((cert, index) => (
               <div
                 key={index}
-                className="flex items-center p-4 bg-slate-50 rounded-xl shadow-sm hover:shadow-md transition"
+                className="flex items-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl shadow-sm hover:shadow-md transition dark:border dark:border-slate-700"
               >
-                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                <span className="font-medium">{cert}</span>
+                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-500 mr-3" />
+                <span className="font-medium dark:text-slate-200">{cert}</span>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-slate-500">No certifications added yet</p>
+          <p className="text-slate-500 dark:text-slate-400">No certifications added yet</p>
         )}
       </div>
     </div>

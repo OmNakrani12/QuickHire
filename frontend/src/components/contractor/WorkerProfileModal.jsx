@@ -29,31 +29,30 @@ export default function WorkerProfileModal({ worker, onClose, onHire, onMessage 
 
     return (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-modal">
-
+            <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-modal dark:bg-slate-900 border dark:border-slate-800">
                 {/* Header */}
-                <div className="flex justify-between items-center px-6 py-4 border-b">
-                    <h2 className="text-lg font-semibold text-slate-800">
+                <div className="flex justify-between items-center px-6 py-4 border-b dark:border-slate-800">
+                    <h2 className="text-lg font-semibold text-slate-800 dark:text-white">
                         Worker Details
                     </h2>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-lg hover:bg-secondary-100 transition"
+                        className="p-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-slate-800 transition"
                     >
-                        <X className="w-5 h-5 text-secondary-500" />
+                        <X className="w-5 h-5 text-secondary-500 dark:text-secondary-400" />
                     </button>
                 </div>
 
                 <div className="grid md:grid-cols-3">
 
                     {/* LEFT PROFILE PANEL */}
-                    <div className="bg-secondary-50 p-6 border-r flex flex-col items-center text-center">
+                    <div className="bg-secondary-50 dark:bg-slate-800/50 p-6 border-r dark:border-slate-800 flex flex-col items-center text-center">
                         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-secondary-500 to-secondary-600 text-white text-3xl font-bold flex items-center justify-center shadow-lg">
                             {name.charAt(0)}
                         </div>
 
-                        <h3 className="mt-4 text-xl font-bold">{name}</h3>
-                        <p className="text-black-500 flex items-center gap-1 mt-1">
+                        <h3 className="mt-4 text-xl font-bold dark:text-white">{name}</h3>
+                        <p className="text-slate-500 flex items-center gap-1 mt-1 dark:text-slate-400">
                             <MapPin className="w-4 h-4" />
                             {location}
                         </p>
@@ -63,7 +62,7 @@ export default function WorkerProfileModal({ worker, onClose, onHire, onMessage 
                             <span className="font-semibold">{rating}</span>
                         </div>
 
-                        <div className="mt-4 text-sm text-black-600">
+                        <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
                             <Briefcase className="w-4 h-4 inline mr-1" />
                             {experience} Jobs Completed
                         </div>
@@ -78,7 +77,7 @@ export default function WorkerProfileModal({ worker, onClose, onHire, onMessage 
 
                             <button
                                 onClick={() => onMessage?.(worker)}
-                                className="w-full border border-secondary-300 py-2 rounded-lg hover:bg-secondary-100 transition flex items-center justify-center gap-2"
+                                className="w-full border border-secondary-300 dark:border-slate-600 dark:text-slate-300 py-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2"
                             >
                                 <MessageSquare className="w-4 h-4" />
                                 Message
@@ -92,20 +91,20 @@ export default function WorkerProfileModal({ worker, onClose, onHire, onMessage 
                         {/* Contact Info */}
                         {(email || phone) && (
                             <div>
-                                <h4 className="font-semibold text-black-700 mb-3">
+                                <h4 className="font-semibold text-slate-800 dark:text-white mb-3">
                                     Contact Information
                                 </h4>
                                 <div className="grid sm:grid-cols-2 gap-4">
                                     {email && (
-                                        <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg">
-                                            <Mail className="w-4 h-4 text-secondary-500" />
-                                            <span className="text-sm">{email}</span>
+                                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
+                                            <Mail className="w-4 h-4 text-secondary-500 dark:text-secondary-400" />
+                                            <span className="text-sm dark:text-slate-300">{email}</span>
                                         </div>
                                     )}
                                     {phone && (
-                                        <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg">
-                                            <Phone className="w-4 h-4 text-secondary-500" />
-                                            <span className="text-sm">{phone}</span>
+                                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
+                                            <Phone className="w-4 h-4 text-secondary-500 dark:text-secondary-400" />
+                                            <span className="text-sm dark:text-slate-300">{phone}</span>
                                         </div>
                                     )}
                                 </div>
@@ -115,14 +114,14 @@ export default function WorkerProfileModal({ worker, onClose, onHire, onMessage 
                         {/* Skills */}
                         {skills.length > 0 && (
                             <div>
-                                <h4 className="font-semibold text-black-700 mb-3">
+                                <h4 className="font-semibold text-slate-800 dark:text-white mb-3">
                                     Skills & Expertise
                                 </h4>
                                 <div className="flex flex-wrap gap-2">
                                     {skills.map((skill, i) => (
                                         <span
                                             key={i}
-                                            className="px-3 py-1 bg-secondary-50 text-secondary-600 text-sm rounded-full font-medium"
+                                            className="px-3 py-1 bg-secondary-50 dark:bg-slate-800 text-secondary-600 dark:text-secondary-400 text-sm rounded-full font-medium"
                                         >
                                             {typeof skill === "object"
                                                 ? skill.name
@@ -134,12 +133,12 @@ export default function WorkerProfileModal({ worker, onClose, onHire, onMessage 
                         )}
 
                         {/* Bio */}
-                        {worker.user.bio && (
+                        {worker.user?.bio && (
                             <div>
-                                <h4 className="font-semibold text-black-700 mb-2">
+                                <h4 className="font-semibold text-slate-800 dark:text-white mb-2">
                                     About Worker
                                 </h4>
-                                <p className="text-secondary-600 text-sm leading-relaxed">
+                                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
                                     {worker.user.bio}
                                 </p>
                             </div>
@@ -147,18 +146,18 @@ export default function WorkerProfileModal({ worker, onClose, onHire, onMessage 
                         {/* Certifications */}
                         {certifications.length > 0 && (
                             <div>
-                                <h4 className="font-semibold text-black-700 mb-3">
+                                <h4 className="font-semibold text-slate-800 dark:text-white mb-3">
                                     Certifications & Licenses
                                 </h4>
                                 <div className="flex flex-wrap gap-2">
-                                    {certifications.map((skill, i) => (
+                                    {certifications.map((cert, i) => (
                                         <span
                                             key={i}
-                                            className="px-3 py-1 bg-secondary-50 text-secondary-600 text-sm rounded-full font-medium"
+                                            className="px-3 py-1 bg-secondary-50 dark:bg-slate-800 text-secondary-600 dark:text-secondary-400 text-sm rounded-full font-medium"
                                         >
-                                            {typeof skill === "object"
-                                                ? certifications.name
-                                                : certifications}
+                                            {typeof cert === "object"
+                                                ? cert.name
+                                                : cert}
                                         </span>
                                     ))}
                                 </div>

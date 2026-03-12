@@ -29,7 +29,7 @@ const SKILL_OPTIONS = [
     "HVAC",
 ];
 
-export default function FindWorkers() {
+export default function FindWorkers({ onNavigateToMessages }) {
     const [workers, setWorkers] = useState([]);
     const [filtered, setFiltered] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -88,11 +88,12 @@ export default function FindWorkers() {
             const safeIncludes = (val, query) => (val ? String(val).toLowerCase().includes(query) : false);
 
             result = result.filter((w) => {
+                if (!w) return false;
                 const skillsArr = parseSkills(w?.skills);
                 const nameMatch = safeIncludes(w?.user?.name, q);
                 const locMatch = safeIncludes(w?.user?.location, q);
                 const availMatch = safeIncludes(w?.availability, q);
-                const skillMatch = skillsArr.some((s) => safeIncludes(typeof s === 'object' ? (s.name || s.title || '') : s, q));
+                const skillMatch = skillsArr.some((s) => safeIncludes(s && typeof s === 'object' ? (s.name || s.title || '') : s, q));
 
                 return nameMatch || locMatch || availMatch || skillMatch;
             });
@@ -103,8 +104,9 @@ export default function FindWorkers() {
             const safeIncludes = (val, query) => (val ? String(val).toLowerCase().includes(query) : false);
 
             result = result.filter((w) => {
+                if (!w) return false;
                 const skillsArr = parseSkills(w?.skills);
-                return skillsArr.some((s) => safeIncludes(typeof s === 'object' ? (s.name || s.title || '') : s, q));
+                return skillsArr.some((s) => safeIncludes(s && typeof s === 'object' ? (s.name || s.title || '') : s, q));
             });
         }
 
@@ -131,13 +133,13 @@ export default function FindWorkers() {
             <div className="card p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h2 className="text-2xl font-bold gradient-text">Find Workers</h2>
-                        <p className="text-slate-500 mt-1">
+                        <h2 className="text-2xl font-bold gradient-text dark:text-white">Find Workers</h2>
+                        <p className="text-slate-500 dark:text-slate-400 mt-1">
                             Browse and connect with skilled workers for your projects
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-2 bg-secondary-50 text-secondary-700 px-4 py-2 rounded-full text-sm font-medium border border-secondary-200">
+                        <span className="flex items-center gap-2 bg-secondary-50 dark:bg-secondary-900/30 text-secondary-700 dark:text-secondary-300 px-4 py-2 rounded-full text-sm font-medium border border-secondary-200 dark:border-secondary-800">
                             <Users className="w-4 h-4" />
                             {filtered.length} Workers Found
                         </span>
@@ -160,21 +162,21 @@ export default function FindWorkers() {
 
                 {/* Search Bar */}
                 <div className="mt-4 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                     <input
                         type="text"
                         placeholder="Search by name, skill, or location..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="input pl-12 pr-4"
+                        className="input pl-12 pr-4 bg-transparent dark:bg-slate-900/50 dark:border-slate-700 dark:text-white dark:placeholder-slate-500"
                     />
                 </div>
 
                 {/* Filter Panel */}
                 {showFilters && (
-                    <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-600 mb-1">
+                            <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">
                                 Skill
                             </label>
                             <select
@@ -192,7 +194,7 @@ export default function FindWorkers() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-600 mb-1">
+                            <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1">
                                 Minimum Rating
                             </label>
                             <select
@@ -225,19 +227,24 @@ export default function FindWorkers() {
             {/* Worker Cards */}
             {filtered.length === 0 ? (
                 <div className="card p-12 text-center">
-                    <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-slate-600 mb-1">
+                    <Users className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-300 mb-1">
                         No Workers Found
                     </h3>
-                    <p className="text-slate-400 text-sm">
+                    <p className="text-slate-400 dark:text-slate-500 text-sm">
                         Try adjusting your search or filters.
                     </p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filtered.map((worker) => (
-                        <WorkerCard key={worker.id} worker={worker} onViewProfile={setSelectedWorker} />
-                    ))}
+                    {filtered.map((worker, index) => worker ? (
+                        <WorkerCard
+                            key={worker.id || `worker-${index}`}
+                            worker={worker}
+                            onViewProfile={setSelectedWorker}
+                            onNavigateToMessages={onNavigateToMessages}
+                        />
+                    ) : null)}
                 </div>
             )}
 
@@ -254,7 +261,7 @@ export default function FindWorkers() {
     );
 }
 
-function WorkerCard({ worker, onViewProfile }) {
+function WorkerCard({ worker, onViewProfile, onNavigateToMessages }) {
     if (!worker) return null;
 
     const name = worker.user?.name || "Worker";
@@ -294,10 +301,10 @@ function WorkerCard({ worker, onViewProfile }) {
                     </div>
                 )}
                 <div>
-                    <h3 className="font-bold text-slate-800 text-lg leading-tight">
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight">
                         {name}
                     </h3>
-                    <div className="flex items-center gap-1 text-slate-500 text-sm mt-0.5">
+                    <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-sm mt-0.5">
                         <MapPin className="w-3.5 h-3.5" />
                         {displayLocation}
                     </div>
@@ -306,26 +313,26 @@ function WorkerCard({ worker, onViewProfile }) {
 
             {/* Stats Row */}
             <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="bg-slate-50 rounded-lg py-2">
+                <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg py-2">
                     <div className="flex items-center justify-center gap-1 text-yellow-500 font-bold text-sm">
                         <Star className="w-4 h-4 fill-yellow-400" />
                         {rating !== null ? Number(rating).toFixed(1) : "N/A"}
                     </div>
-                    <div className="text-xs text-slate-400 mt-0.5">Rating</div>
+                    <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Rating</div>
                 </div>
-                <div className="bg-slate-50 rounded-lg py-2">
-                    <div className="flex items-center justify-center gap-1 font-bold text-sm text-secondary-700">
+                <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg py-2">
+                    <div className="flex items-center justify-center gap-1 font-bold text-sm text-secondary-700 dark:text-secondary-400">
                         <Briefcase className="w-4 h-4" />
                         {experience}
                     </div>
-                    <div className="text-xs text-slate-400 mt-0.5">Jobs Done</div>
+                    <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Jobs</div>
                 </div>
-                <div className="bg-slate-50 rounded-lg py-2">
-                    <div className="flex items-center justify-center gap-1 font-bold text-sm text-primary-700">
+                <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg py-2">
+                    <div className="flex items-center justify-center gap-1 font-bold text-sm text-primary-700 dark:text-primary-400">
                         <Award className="w-4 h-4" />
                         {skills.length}
                     </div>
-                    <div className="text-xs text-slate-400 mt-0.5">Skills</div>
+                    <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Skills</div>
                 </div>
             </div>
 
@@ -333,11 +340,11 @@ function WorkerCard({ worker, onViewProfile }) {
             {skills.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                     {skills.slice(0, 4).map((skill, i) => {
-                        const skillName = typeof skill === 'object' ? (skill.name || skill.title || JSON.stringify(skill)) : skill;
+                        const skillName = skill && typeof skill === 'object' ? (skill.name || skill.title || JSON.stringify(skill)) : skill;
                         return (
                             <span
                                 key={i}
-                                className="bg-secondary-50 text-secondary-700 border border-secondary-200 text-xs px-2.5 py-1 rounded-full"
+                                className="bg-secondary-50 dark:bg-secondary-900/40 text-secondary-700 dark:text-secondary-300 border border-secondary-200 dark:border-secondary-700/50 text-xs px-2.5 py-1 rounded-full"
                             >
                                 {String(skillName)}
                             </span>
@@ -352,7 +359,7 @@ function WorkerCard({ worker, onViewProfile }) {
             )}
 
             {/* Actions */}
-            <div className="flex gap-2 mt-auto pt-2 border-t border-slate-100">
+            <div className="flex gap-2 mt-auto pt-2 border-t border-slate-100 dark:border-slate-800/70">
                 <button
                     onClick={() => onViewProfile && onViewProfile(worker)}
                     className="btn btn-secondary flex-1 py-2 text-sm flex items-center justify-center gap-2"
@@ -360,7 +367,17 @@ function WorkerCard({ worker, onViewProfile }) {
                     <Eye className="w-4 h-4" />
                     View Profile
                 </button>
-                <button className="btn btn-outline flex-1 py-2 text-sm flex items-center justify-center gap-2">
+                <button
+                    onClick={() => {
+                        if (onNavigateToMessages && worker.user) {
+                            onNavigateToMessages({
+                                id: worker.user.id,
+                                name: worker.user.name
+                            });
+                        }
+                    }}
+                    className="btn btn-outline dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 flex-1 py-2 text-sm flex items-center justify-center gap-2"
+                >
                     <MessageSquare className="w-4 h-4" />
                     Message
                 </button>

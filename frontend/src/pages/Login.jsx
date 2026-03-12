@@ -31,7 +31,7 @@ export default function Login() {
       );
 
       const user = userCredential.user;
-
+      console.log("Firebase login successful:", user);
       localStorage.setItem(
         "user",
         JSON.stringify({
@@ -39,13 +39,14 @@ export default function Login() {
           role: formData.role,
         })
       );
+      const data = await axios.get(`${BASE_URL}/api/users/email/${user.email}`);
+      localStorage.setItem("uid", data.data.id);
+      localStorage.setItem("user", JSON.stringify(data.data));
       navigate(
         formData.role === "worker"
           ? "/worker/dashboard"
           : "/contractor/dashboard"
       );
-      const data = await axios.get(`${BASE_URL}/api/users/email/${user.email}`);
-      localStorage.setItem("uid", data.data.id);
       const data1 = await axios.get(`${BASE_URL}/api/${formData.role}s/user/${data.data.id}`);
       localStorage.setItem("wid", data1.data.id);
       console.log("User ID stored in localStorage:", data.data.id);
@@ -94,8 +95,8 @@ export default function Login() {
                   }
                   className={`p-3 rounded-lg border-2 transition-all ${
                     formData.role === "worker"
-                      ? "border-primary-600 bg-primary-50"
-                      : "border-slate-200 hover:border-primary-300"
+                      ? "border-primary-600 bg-primary-50 dark:bg-primary-900/30 dark:text-primary-300 dark:border-primary-700"
+                      : "border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600"
                   }`}
                 >
                   Worker
@@ -108,8 +109,8 @@ export default function Login() {
                   }
                   className={`p-3 rounded-lg border-2 transition-all ${
                     formData.role === "contractor"
-                      ? "border-secondary-600 bg-secondary-50"
-                      : "border-slate-200 hover:border-secondary-300"
+                      ? "border-secondary-600 bg-secondary-50 dark:bg-secondary-900/30 dark:text-secondary-300 dark:border-secondary-700"
+                      : "border-slate-200 dark:border-slate-700 hover:border-secondary-300 dark:hover:border-secondary-600"
                   }`}
                 >
                   Contractor
@@ -119,11 +120,11 @@ export default function Login() {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold mb-2">
+              <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                 <input
                   type="email"
                   required
@@ -139,11 +140,11 @@ export default function Login() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-semibold mb-2">
+              <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                 <input
                   type="password"
                   required
@@ -185,11 +186,11 @@ export default function Login() {
           </form>
 
           {/* Signup Link */}
-          <p className="text-center mt-6 text-slate-600">
+          <p className="text-center mt-6 text-slate-600 dark:text-slate-400">
             Don't have an account?{" "}
             <Link
               to="/signup"
-              className="text-primary-600 font-semibold hover:underline"
+              className="text-primary-600 dark:text-primary-400 font-semibold hover:underline"
             >
               Sign up
             </Link>

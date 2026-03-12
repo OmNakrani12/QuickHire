@@ -174,26 +174,26 @@ export default function ContractorEditProfile() {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 py-8 px-4">
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="mb-8 animate-slide-down">
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-4xl font-bold gradient-text mb-2">Edit Profile</h1>
-                            <p className="text-slate-600">Update your company information</p>
+                            <p className="text-slate-600 dark:text-slate-400">Update your company information</p>
                         </div>
                         <button
                             onClick={handleCancel}
-                            className="p-3 rounded-lg bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                            className="p-3 rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all hover:scale-105"
                         >
-                            <X className="w-6 h-6 text-slate-700" />
+                            <X className="w-6 h-6 text-slate-700 dark:text-slate-300" />
                         </button>
                     </div>
                 </div>
 
                 {/* Profile Photo Section */}
-                <div className="card p-8 mb-6 animate-scale-in">
+                <div className="card dark:bg-slate-900/80 dark:border-slate-800 p-8 mb-6 animate-scale-in">
                     <div className="flex items-center space-x-6">
                         <div className="relative">
                             {photoPreview ? (
@@ -217,14 +217,14 @@ export default function ContractorEditProfile() {
                             <button
                                 type="button"
                                 onClick={() => document.getElementById('photo-upload').click()}
-                                className="absolute bottom-0 right-0 p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 border-4 border-white"
+                                className="absolute bottom-0 right-0 p-3 bg-white dark:bg-slate-800 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 border-4 border-white dark:border-slate-800"
                             >
-                                <Camera className="w-5 h-5 text-secondary-600" />
+                                <Camera className="w-5 h-5 text-secondary-600 dark:text-secondary-500" />
                             </button>
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold mb-2">Company Logo</h3>
-                            <p className="text-slate-600 mb-3">Upload your company logo or profile photo</p>
+                            <h3 className="text-xl font-bold mb-2 dark:text-white">Company Logo</h3>
+                            <p className="text-slate-600 dark:text-slate-400 mb-3">Upload your company logo or profile photo</p>
                             <button
                                 type="button"
                                 onClick={() => document.getElementById('photo-upload').click()}
@@ -238,14 +238,14 @@ export default function ContractorEditProfile() {
                 </div>
 
                 {/* Personal Information */}
-                <div className="card p-8 mb-6 animate-slide-up">
-                    <h2 className="text-2xl font-bold mb-6 flex items-center">
-                        <User className="w-6 h-6 mr-2 text-secondary-600" />
+                <div className="card dark:bg-slate-900/80 dark:border-slate-800 p-8 mb-6 animate-slide-up">
+                    <h2 className="text-2xl font-bold mb-6 flex items-center dark:text-white">
+                        <User className="w-6 h-6 mr-2 text-secondary-600 dark:text-secondary-500" />
                         Personal Information
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Full Name
                             </label>
                             <input
@@ -253,60 +253,60 @@ export default function ContractorEditProfile() {
                                 name="name"
                                 value={formData.name}
                                 onChange={handleInputChange}
-                                className="input"
+                                className="input dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                 placeholder="John Doe"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Email Address
                             </label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleInputChange}
-                                    className="input pl-11"
+                                    className="input pl-11 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                     placeholder="john@example.com"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Phone Number
                             </label>
                             <div className="relative">
-                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="tel"
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleInputChange}
-                                    className="input pl-11"
+                                    className="input pl-11 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                     placeholder="+1 (555) 000-0000"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Location
                             </label>
                             <div className="relative">
-                                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="text"
                                     name="location"
                                     value={formData.location}
                                     onChange={handleInputChange}
-                                    className="input pl-11"
+                                    className="input pl-11 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                     placeholder="New York, NY"
                                 />
                             </div>
                         </div>
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Bio
                             </label>
                             <textarea
@@ -314,7 +314,7 @@ export default function ContractorEditProfile() {
                                 value={formData.bio}
                                 onChange={handleInputChange}
                                 rows="4"
-                                className="input resize-none"
+                                className="input resize-none dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                 placeholder="Tell workers about your company and what makes you a great employer..."
                             />
                         </div>
@@ -322,14 +322,14 @@ export default function ContractorEditProfile() {
                 </div>
 
                 {/* Company Information */}
-                <div className="card p-8 mb-6 animate-slide-up">
-                    <h2 className="text-2xl font-bold mb-6 flex items-center">
-                        <Building2 className="w-6 h-6 mr-2 text-secondary-600" />
+                <div className="card dark:bg-slate-900/80 dark:border-slate-800 p-8 mb-6 animate-slide-up">
+                    <h2 className="text-2xl font-bold mb-6 flex items-center dark:text-white">
+                        <Building2 className="w-6 h-6 mr-2 text-secondary-600 dark:text-secondary-500" />
                         Company Information
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Company Name
                             </label>
                             <input
@@ -337,19 +337,19 @@ export default function ContractorEditProfile() {
                                 name="companyName"
                                 value={formData.companyName}
                                 onChange={handleInputChange}
-                                className="input"
+                                className="input dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                 placeholder="ABC Construction Inc."
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Company Type
                             </label>
                             <select
                                 name="companyType"
                                 value={formData.companyType}
                                 onChange={handleInputChange}
-                                className="input"
+                                className="input dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                             >
                                 <option value="General Contractor">General Contractor</option>
                                 <option value="Subcontractor">Subcontractor</option>
@@ -359,24 +359,24 @@ export default function ContractorEditProfile() {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Years in Business
                             </label>
                             <div className="relative">
-                                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="number"
                                     name="yearsInBusiness"
                                     value={formData.yearsInBusiness}
                                     onChange={handleInputChange}
                                     onWheel={(e) => e.target.blur()}
-                                    className="input pl-11"
+                                    className="input pl-11 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                     placeholder="15"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 License Number
                             </label>
                             <input
@@ -384,12 +384,12 @@ export default function ContractorEditProfile() {
                                 name="licenseNumber"
                                 value={formData.licenseNumber}
                                 onChange={handleInputChange}
-                                className="input"
+                                className="input dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                 placeholder="LIC-123456"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Insurance Provider
                             </label>
                             <input
@@ -397,12 +397,12 @@ export default function ContractorEditProfile() {
                                 name="insuranceProvider"
                                 value={formData.insuranceProvider}
                                 onChange={handleInputChange}
-                                className="input"
+                                className="input dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                 placeholder="ABC Insurance Co."
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 Website
                             </label>
                             <input
@@ -410,7 +410,7 @@ export default function ContractorEditProfile() {
                                 name="website"
                                 value={formData.website}
                                 onChange={handleInputChange}
-                                className="input"
+                                className="input dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                                 placeholder="https://www.example.com"
                             />
                         </div>

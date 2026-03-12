@@ -57,7 +57,7 @@ export default function Projects() {
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [saving, setSaving] = useState(false);
 
-    const contractorId = localStorage.getItem("uid");
+    const contractorId = localStorage.getItem("wid");
 
     /* ── fetch ────────────────────────────────────────────── */
     const fetchProjects = async () => {
