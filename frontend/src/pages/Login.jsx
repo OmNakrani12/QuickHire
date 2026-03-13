@@ -42,14 +42,16 @@ export default function Login() {
       const data = await axios.get(`${BASE_URL}/api/users/email/${user.email}`);
       localStorage.setItem("uid", data.data.id);
       localStorage.setItem("user", JSON.stringify(data.data));
+      const data1 = await axios.get(`${BASE_URL}/api/${formData.role}s/user/${data.data.id}`);
+      localStorage.setItem("wid", data1.data.id);
+      console.log("User ID stored in localStorage:", data.data.id);
+
+      // Navigate ONLY after all localStorage data is saved!
       navigate(
         formData.role === "worker"
           ? "/worker/dashboard"
           : "/contractor/dashboard"
       );
-      const data1 = await axios.get(`${BASE_URL}/api/${formData.role}s/user/${data.data.id}`);
-      localStorage.setItem("wid", data1.data.id);
-      console.log("User ID stored in localStorage:", data.data.id);
     } catch (err) {
       setError(getFriendlyError(err.code));
     } finally {

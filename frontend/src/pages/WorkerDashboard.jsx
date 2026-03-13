@@ -41,7 +41,21 @@ export default function WorkerDashboard() {
             if (!user) return;
             try {
                 setIsLoading(true);
-                const workerRes = await axios.get(`${BASE_URL}/api/workers/user/${user.id}`);
+                
+                let currentUserId = user.id;
+                // Fallback: If localStorage is corrupted or missing ID, fetch it by email
+                if (!currentUserId && user.email) {
+                    const userRes = await axios.get(`${BASE_URL}/api/users/email/${user.email}`);
+                    currentUserId = userRes.data.id;
+                    // Update localStorage so it's fixed for next time
+                    localStorage.setItem('user', JSON.stringify(userRes.data));
+                }
+
+                if (!currentUserId) {
+                    throw new Error("User ID is missing and couldn't be fetched.");
+                }
+
+                const workerRes = await axios.get(`${BASE_URL}/api/workers/user/${currentUserId}`);
                 const worker = workerRes.data;
                 setWorkerData(worker);
 
@@ -61,6 +75,19 @@ export default function WorkerDashboard() {
         navigate('/');
     };
 
+    const handleJobComplete = async (jobId) => {
+        try {
+            await axios.put(`${BASE_URL}/api/jobs/${jobId}/status`, { status: 'COMPLETED' });
+            // Refresh data immediately
+            if (workerData) {
+                const appsRes = await axios.get(`${BASE_URL}/api/jobs/applications/worker/${workerData.id}`);
+                setApplications(appsRes.data);
+            }
+        } catch (error) {
+            console.error("Error auto-completing job:", error);
+        }
+    };
+
     if (!user || isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
@@ -74,23 +101,46 @@ export default function WorkerDashboard() {
     const pendingJobsList = applications.filter(app => app.status === 'PENDING' && app.job);
     const completedJobsList = applications.filter(app => app.status === 'ACCEPTED' && app.job && app.job.status === 'COMPLETED');
 
-    const activeJobs = activeJobsList.map(app => ({
-        id: app.id,
-        title: app.job.title,
-        contractor: app.job.contractor ? app.job.contractor.companyName : "Unknown Contractor",
-        progress: 50, // Mock progress since backend doesn't track it
-        dueDate: app.job.duration || 'N/A',
-        status: app.job.status || 'In Progress',
-    }));
+    const parseDuration = (durationStr) => {
+        if (!durationStr) return 24 * 60 * 60 * 1000; // default 1 day
+        const str = durationStr.toLowerCase();
+        const num = parseFloat(str) || 1;
+        if (str.includes('hour')) return num * 60 * 60 * 1000;
+        if (str.includes('min')) return num * 60 * 1000;
+        if (str.includes('sec')) return Math.max(num * 1000, 10000); // demo minimum 10s
+        if (str.includes('day')) return num * 24 * 60 * 60 * 1000;
+        if (str.includes('week')) return num * 7 * 24 * 60 * 60 * 1000;
+        if (str.includes('month')) return num * 30 * 24 * 60 * 60 * 1000;
+        return num * 24 * 60 * 60 * 1000;
+    };
 
-    const pendingJobs = pendingJobsList.map(app => ({
-        id: app.id,
-        title: app.job.title,
-        contractor: app.job.contractor ? app.job.contractor.companyName : "Unknown Contractor",
-        appliedDate: new Date(app.appliedAt).toLocaleDateString(),
-        proposedRate: app.proposedRate,
-        duration: app.job.duration || 'N/A'
-    }));
+    const activeJobs = activeJobsList.map(app => {
+        const start = app.acceptedAt ? new Date(app.acceptedAt) : new Date(app.appliedAt || Date.now());
+        const durationMs = parseDuration(app.job.duration);
+        const contractorName = app.job.contractor?.companyName || app.job.contractor?.user?.name || "Unknown Contractor";
+        return {
+            id: app.id,
+            jobId: app.job.id,
+            title: app.job.title,
+            contractor: contractorName,
+            dueDate: app.job.duration || 'N/A',
+            status: app.job.status || 'In Progress',
+            startTime: start.getTime(),
+            durationMs: durationMs
+        };
+    });
+
+    const pendingJobs = pendingJobsList.map(app => {
+        const contractorName = app.job.contractor?.companyName || app.job.contractor?.user?.name || "Unknown Contractor";
+        return {
+            id: app.id,
+            title: app.job.title,
+            contractor: contractorName,
+            appliedDate: new Date(app.appliedAt).toLocaleDateString(),
+            proposedRate: app.proposedRate,
+            duration: app.job.duration || 'N/A'
+        };
+    });
 
     const recentEarnings = completedJobsList.map(app => ({
         date: new Date(app.appliedAt).toLocaleDateString(),
@@ -121,7 +171,7 @@ export default function WorkerDashboard() {
                 {activeTab === 'dashboard' && (
                     <div className="space-y-8 animate-fade-in">
                         <StatsGrid stats={stats} />
-                        <ActiveJobs jobs={activeJobs} />
+                        <ActiveJobs jobs={activeJobs} onJobComplete={handleJobComplete} />
                         <PendingApplications applications={pendingJobs} />
                         <RecentEarnings earnings={recentEarnings} />
                     </div>
@@ -133,7 +183,7 @@ export default function WorkerDashboard() {
 
                 {activeTab === 'active' && (
                     <div className="space-y-8 animate-fade-in">
-                        <ActiveJobs jobs={activeJobs} />
+                        <ActiveJobs jobs={activeJobs} onJobComplete={handleJobComplete} />
                         <PendingApplications applications={pendingJobs} />
                     </div>
                 )}

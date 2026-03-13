@@ -130,6 +130,9 @@
 
             return applicationRepository.findById(applicationId).map(app -> {
                 app.setStatus(status);
+                if ("ACCEPTED".equalsIgnoreCase(status) && app.getAcceptedAt() == null) {
+                    app.setAcceptedAt(java.time.LocalDateTime.now());
+                }
                 applicationRepository.save(app);
                 
                 // TODO: Here we will later trigger a dynamic notification to the worker
@@ -137,6 +140,30 @@
                 return ResponseEntity.ok(Map.of(
                     "message", "Application status updated to " + status,
                     "application", app
+                ));
+            }).orElse(ResponseEntity.notFound().build());
+        }
+
+        // ── Update job status ────────────────────────────────────────────────────
+        @PutMapping("/{jobId}/status")
+        public ResponseEntity<?> updateJobStatus(
+                @PathVariable Long jobId,
+                @RequestBody Map<String, String> body) {
+            
+            String status = body.get("status");
+            if (status == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Status is required"));
+            }
+
+            return jobRepository.findById(jobId).map(job -> {
+                job.setStatus(status);
+                jobRepository.save(job);
+                
+                // TODO: Trigger dynamic notification to worker/contractor upon job completion
+                
+                return ResponseEntity.ok(Map.of(
+                    "message", "Job status updated to " + status,
+                    "job", job
                 ));
             }).orElse(ResponseEntity.notFound().build());
         }

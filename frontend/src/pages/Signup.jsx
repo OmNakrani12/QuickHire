@@ -125,23 +125,7 @@ export default function SignupPage() {
             const user = userCredential.user;
             console.log("User created:", user);
 
-            localStorage.setItem(
-                "user",
-                JSON.stringify({
-                    uid: user.uid,
-                    name: formData.name,
-                    email: formData.email,
-                    role: formData.role,
-                    phone: formData.phone,
-                })
-            );
-
-            if (formData.role === "worker") {
-                navigate("/worker/dashboard");
-            } else {
-                navigate("/contractor/dashboard");
-            }
-            await fetch(`${BASE_URL}/api/users`, {
+            const res = await fetch(`${BASE_URL}/api/users`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -154,6 +138,33 @@ export default function SignupPage() {
                     phone: formData.phone,
                 }),
             });
+            const dbUser = await res.json();
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify({
+                    ...dbUser,
+                    uid: user.uid,
+                })
+            );
+            localStorage.setItem("uid", dbUser.id);
+
+            // Fetch or create the specific role record to put wid in local storage
+            let roleRes;
+            try {
+               roleRes = await fetch(`${BASE_URL}/api/${formData.role}s/user/${dbUser.id}`);
+               if (roleRes.ok) {
+                   const roleData = await roleRes.json();
+                   localStorage.setItem("wid", roleData.id);
+               }
+            } catch (e) { console.error(e) }
+
+            if (formData.role === "worker") {
+                navigate("/worker/dashboard");
+            } else {
+                navigate("/contractor/dashboard");
+            }
+
         } catch (error) {
             console.error(error);
             alert(error.message);

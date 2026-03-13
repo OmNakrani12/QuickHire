@@ -33,6 +33,8 @@ public class Application {
 
     private LocalDateTime appliedAt;
 
+    private LocalDateTime acceptedAt;
+
     @PrePersist
     protected void onApply() {
         appliedAt = LocalDateTime.now();
@@ -61,4 +63,7 @@ public class Application {
     public void setAvailableFrom(String availableFrom) { this.availableFrom = availableFrom; }
 
     public LocalDateTime getAppliedAt() { return appliedAt; }
+
+    public LocalDateTime getAcceptedAt() { return acceptedAt; }
+    public void setAcceptedAt(LocalDateTime acceptedAt) { this.acceptedAt = acceptedAt; }
 }
