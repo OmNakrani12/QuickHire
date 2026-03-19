@@ -26,6 +26,7 @@ export default function ChatWindow({
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
     const [connected, setConnected] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const clientRef = useRef(null);
     const messagesEndRef = useRef(null);
@@ -129,35 +130,55 @@ export default function ChatWindow({
     }, [messages]);
 
     // ── Sent bubble: secondary-600 gradient (contractor theme)
-    const sentBubbleCls = "bg-gradient-to-r from-secondary-600 to-secondary-700 text-white rounded-br-none";
-    const receivedBubbleCls = "bg-secondary-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-none border border-secondary-100 dark:border-slate-700";
+    const sentBubbleCls = "bg-secondary-600 text-white rounded-br-sm shadow-sm";
+    const receivedBubbleCls = "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-sm border border-slate-100 dark:border-slate-700 shadow-sm";
 
     return (
-        <div
-            className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-slate-800 overflow-hidden animate-fade-in flex flex-col"
-            style={{ height: "calc(100vh - 10rem)" }}
-        >
+        <div className="bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 overflow-hidden animate-fade-in flex flex-col h-full w-full relative">
             <div className="flex flex-1 min-h-0 h-full">
-
                 {/* ── Contacts sidebar ─────────────────────────────────────────── */}
                 <div
-                    className={`${showContacts ? "flex" : "hidden md:flex"
-                        } flex-col w-full md:w-72 border-r border-slate-100 dark:border-slate-800 shrink-0 h-full min-h-0`}
+                    className={`${showContacts ? "flex" : "hidden md:flex"} flex-col w-full md:w-80 border-r border-slate-100 dark:border-slate-800 shrink-0 h-full bg-slate-50/50 dark:bg-slate-800/20`}
                 >
                     {/* Sidebar header */}
-                    <div className="bg-gradient-to-r from-secondary-600 to-secondary-700 px-5 py-4">
-                        <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                            <MessageSquare className="w-5 h-5" />
-                            Messages
-                        </h2>
-                        <p className="text-secondary-100 text-xs mt-0.5">
-                            {connected ? "● Connected" : "○ Connecting…"}
-                        </p>
+                    <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                Messages
+                                <span className="bg-secondary-100 dark:bg-secondary-900/30 text-secondary-600 dark:text-secondary-400 text-xs px-2 py-0.5 rounded-full font-semibold">
+                                    {contacts.length}
+                                </span>
+                            </h2>
+                            <div className="flex items-center gap-1.5 mt-1 text-xs font-medium text-slate-500">
+                                <div className={`w-2 h-2 rounded-full ${connected ? 'bg-emerald-500' : 'bg-slate-300'}`}></div>
+                                {connected ? "Connected" : "Reconnecting..."}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Search Bar (Visual) */}
+                    <div className="p-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search messages..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 border focus:border-secondary-500 focus:ring-2 focus:ring-secondary-500/20 rounded-xl text-sm transition-all"
+                            />
+                        </div>
                     </div>
 
                     {/* Contact list */}
-                    <div className="flex-1 overflow-y-auto divide-y divide-slate-50">
-                        {contacts.map((contact) => {
+                    <div className="flex-1 overflow-y-auto w-full style-scrollbar px-2 py-2 space-y-1">
+                        {contacts
+                            .filter(contact => contact.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                            .map((contact) => {
                             const isActive = activeContact.id === contact.id;
                             return (
                                 <button
@@ -166,29 +187,34 @@ export default function ChatWindow({
                                         setActiveContact({ id: contact.id, name: contact.name });
                                         setShowContacts(false);
                                     }}
-                                    className={`w-full text-left px-4 py-3.5 transition-all hover:bg-secondary-50 dark:hover:bg-slate-800/50 ${isActive
-                                        ? "bg-secondary-50 dark:bg-slate-800 border-l-4 border-secondary-600"
-                                        : "border-l-4 border-transparent"
-                                        }`}
+                                    className={`w-full text-left p-3 rounded-2xl transition-all duration-200 group flex items-center gap-3 relative ${
+                                        isActive
+                                            ? "bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700"
+                                            : "hover:bg-slate-100 dark:hover:bg-slate-800/50 border border-transparent"
+                                    }`}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 bg-gradient-to-br from-secondary-600 to-secondary-700">
+                                    <div className="relative shrink-0">
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-sm bg-gradient-to-br ${isActive ? 'from-secondary-500 to-secondary-600' : 'from-slate-400 to-slate-500'}`}>
                                             {contact.name.charAt(0)}
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-semibold text-sm text-slate-700 dark:text-slate-200 truncate">
-                                                    {contact.name}
-                                                </span>
-                                                {contact.unread > 0 && (
-                                                    <span className="ml-2 shrink-0 bg-secondary-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                                                        {contact.unread}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <p className="text-xs text-slate-400 truncate mt-0.5">
-                                                {contact.lastMessage}
+                                        <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+                                    </div>
+                                    <div className="flex-1 min-w-0 pr-1">
+                                        <div className="flex items-center justify-between mb-0.5">
+                                            <span className={`font-bold text-sm truncate ${isActive ? 'text-secondary-700 dark:text-secondary-400' : 'text-slate-800 dark:text-slate-200'}`}>
+                                                {contact.name}
+                                            </span>
+                                            <span className="text-[10px] font-medium text-slate-400 whitespace-nowrap ml-2">Just now</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <p className={`text-xs truncate ${contact.unread > 0 ? 'font-semibold text-slate-800 dark:text-slate-200' : 'text-slate-500 dark:text-slate-400'}`}>
+                                                {contact.lastMessage || "No messages yet"}
                                             </p>
+                                            {contact.unread > 0 && (
+                                                <span className="ml-2 shrink-0 bg-secondary-600 outline outline-2 outline-white dark:outline-slate-800 text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center">
+                                                    {contact.unread}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </button>
@@ -199,80 +225,104 @@ export default function ChatWindow({
 
                 {/* ── Chat pane ───────────────────────────────────────────────── */}
                 <div
-                    className={`${showContacts ? "hidden md:flex" : "flex"} flex-col flex-1 min-h-0`}
+                    className={`${showContacts ? "hidden md:flex" : "flex"} flex-col flex-1 min-w-0 bg-slate-50 dark:bg-slate-900 h-full relative`}
                 >
                     {/* Chat header */}
-                    <div className="bg-gradient-to-r from-secondary-600 to-secondary-700 px-5 py-4 flex items-center gap-3">
-                        <button
-                            onClick={() => setShowContacts(true)}
-                            className="md:hidden text-white/80 hover:text-white mr-1"
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </button>
+                    <div className="px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 z-10 shadow-sm">
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={() => setShowContacts(true)}
+                                className="md:hidden w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 mr-1"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
 
-                        <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm">
-                            {activeContact.name ? activeContact.name.charAt(0) : "?"}
-                        </div>
-
-                        <div>
-                            <div className="font-bold text-white text-sm">{activeContact.name || "Select a contact"}</div>
-                            <div className="text-secondary-100 text-xs flex items-center gap-1">
-                                <Circle className="w-2 h-2 fill-green-300 text-green-300" />
-                                {connected ? "Online" : "Connecting…"}
-                            </div>
+                            {activeContact.id ? (
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-secondary-500 to-secondary-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                                            {activeContact.name ? activeContact.name.charAt(0) : "?"}
+                                        </div>
+                                        <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <div className="font-extrabold text-slate-900 dark:text-white text-sm tracking-tight">{activeContact.name}</div>
+                                        <div className="text-emerald-500 font-medium text-xs flex items-center gap-1">
+                                            Online
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="font-bold text-slate-400">Select a contact</div>
+                            )}
                         </div>
                     </div>
 
                     {/* Messages area */}
-                    <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3 bg-slate-50/60 dark:bg-slate-900/40">
+                    <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 bg-slate-50/50 dark:bg-slate-900/40 relative">
+                        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }}></div>
+                        
                         {messages.length === 0 && (
-                            <div className="flex flex-col items-center justify-center h-full text-slate-400 dark:text-slate-500 text-sm py-16">
-                                <MessageSquare className="w-10 h-10 mb-3 opacity-30 text-secondary-300 dark:text-slate-600" />
-                                No messages yet. Say hello!
+                            <div className="flex flex-col items-center justify-center h-full text-slate-400 dark:text-slate-500 py-10 relative z-10">
+                                <div className="w-20 h-20 bg-secondary-50 dark:bg-secondary-900/20 rounded-full flex items-center justify-center mb-4">
+                                    <MessageSquare className="w-8 h-8 text-secondary-400 dark:text-secondary-500" />
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">No messages yet</h3>
+                                <p className="text-sm">Send a message to start the conversation.</p>
                             </div>
                         )}
                         {messages.map((msg, index) => {
                             const isOwn = msg.senderId === currentUserId;
                             return (
-                                <div key={index} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+                                <div key={index} className={`flex ${isOwn ? "justify-end" : "justify-start"} relative z-10 animate-[fadeIn_0.3s_ease-out]`}>
                                     <div
-                                        className={`max-w-xs md:max-w-sm px-4 py-2.5 rounded-2xl shadow-sm text-sm ${isOwn ? sentBubbleCls : receivedBubbleCls
-                                            }`}
+                                        className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-[15px] leading-relaxed relative ${isOwn ? sentBubbleCls : receivedBubbleCls}`}
                                     >
                                         <div>{msg.content}</div>
                                         {msg.timestamp && (
-                                            <div className="text-xs mt-1 opacity-60 text-right">
+                                            <div className={`text-[10px] font-medium mt-1 text-right flex items-center justify-end gap-1 ${isOwn ? 'text-secondary-100' : 'text-slate-400'}`}>
                                                 {new Date(msg.timestamp).toLocaleTimeString([], {
                                                     hour: "2-digit",
                                                     minute: "2-digit",
                                                 })}
+                                                {isOwn && (
+                                                    <svg className="w-3 h-3 text-secondary-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                )}
                                             </div>
                                         )}
                                     </div>
                                 </div>
                             );
                         })}
-                        <div ref={messagesEndRef} />
+                        <div ref={messagesEndRef} className="h-4" />
                     </div>
 
                     {/* Input bar */}
-                    <div className="px-5 py-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
-                        <input
-                            type="text"
-                            className="input flex-1 focus:border-secondary-500 focus:ring-secondary-500/20 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
-                            placeholder="Type your message…"
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                        />
-                        <button
-                            onClick={sendMessage}
-                            disabled={!connected || !activeContact.id}
-                            className="btn btn-secondary flex items-center gap-2"
-                        >
-                            <Send className="w-4 h-4" />
-                            Send
-                        </button>
+                    <div className="px-6 py-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shrink-0 z-10">
+                        <div className="flex items-center gap-3 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-transparent focus-within:border-secondary-200 dark:focus-within:border-secondary-800 focus-within:bg-white dark:focus-within:bg-slate-900 transition-all shadow-inner relative">
+                            <button className="p-2.5 text-slate-400 hover:text-secondary-500 dark:text-slate-500 dark:hover:text-secondary-400 transition-colors rounded-xl hover:bg-secondary-50 dark:hover:bg-slate-800 shrink-0">
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                </svg>
+                            </button>
+                            <input
+                                type="text"
+                                className="flex-1 bg-transparent border-none focus:ring-0 text-[15px] dark:text-slate-100 placeholder-slate-400 font-medium !outline-none px-2"
+                                placeholder="Write a message..."
+                                value={text}
+                                onChange={(e) => setText(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                            />
+                            <button
+                                onClick={sendMessage}
+                                disabled={!connected || !activeContact.id || !text.trim()}
+                                className="bg-secondary-600 hover:bg-secondary-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white p-2.5 rounded-xl transition-colors shadow-sm disabled:shadow-none flex items-center justify-center shrink-0"
+                            >
+                                <Send className="w-4 h-4 ml-0.5" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

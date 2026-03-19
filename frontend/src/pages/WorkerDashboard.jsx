@@ -19,7 +19,14 @@ export default function WorkerDashboard() {
     const { language, setLanguage, t } = useLanguage();
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
-    const [activeTab, setActiveTab] = useState('dashboard');
+    const [activeTab, setActiveTab] = useState(() => {
+        const savedTab = localStorage.getItem('dashboard_tab');
+        if (savedTab) {
+            localStorage.removeItem('dashboard_tab');
+            return savedTab;
+        }
+        return 'dashboard';
+    });
     const [workerData, setWorkerData] = useState(null);
     const [applications, setApplications] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -41,7 +48,7 @@ export default function WorkerDashboard() {
             if (!user) return;
             try {
                 setIsLoading(true);
-                
+
                 let currentUserId = user.id;
                 // Fallback: If localStorage is corrupted or missing ID, fetch it by email
                 if (!currentUserId && user.email) {
@@ -165,8 +172,8 @@ export default function WorkerDashboard() {
                 handleLogout={handleLogout}
             />
 
-            <main className="ml-64 flex-1 p-8">
-                <Header userName={user.name} />
+            <main className={`ml-72 flex-1 max-w-[1600px] mx-auto w-full ${activeTab === 'messages' ? 'h-screen p-0 flex flex-col overflow-hidden' : 'p-8'}`}>
+                {activeTab !== 'messages' && <Header userName={user.name} />}
 
                 {activeTab === 'dashboard' && (
                     <div className="space-y-8 animate-fade-in">
@@ -199,7 +206,7 @@ export default function WorkerDashboard() {
                 )}
 
                 {activeTab === 'messages' && (
-                    <div className="animate-fade-in">
+                    <div className="animate-fade-in flex-1 min-h-0 h-full w-full">
                         <ChatWindow theme="worker" />
                     </div>
                 )}

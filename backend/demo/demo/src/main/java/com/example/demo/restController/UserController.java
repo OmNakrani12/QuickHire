@@ -1,13 +1,12 @@
-package com.example.demo;
+package com.example.demo.restController;
 
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional;
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:3000", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PATCH, RequestMethod.OPTIONS})
+@CrossOrigin(origins = "*")
 public class UserController {
 
     private final UserRepository userRepository;
@@ -25,7 +24,7 @@ public class UserController {
     // ✅ Get user by EMAIL
     @GetMapping("/email/{email}")
     public User getUserByEmail(@PathVariable String email) {
-        return userRepository.findByEmail(email).orElse(null);
+        return userRepository.findFirstByEmail(email).orElse(null);
     }
 
     // ✅ Get all users

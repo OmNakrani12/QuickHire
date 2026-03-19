@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.demo.restController;
 
 import com.example.demo.entity.Worker;
 import com.example.demo.repository.WorkerRepository;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/workers")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"}, methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PATCH, RequestMethod.OPTIONS})
+@CrossOrigin(origins = "*")
 public class WorkerController {
 
     private final WorkerRepository workerRepository;

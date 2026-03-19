@@ -253,8 +253,24 @@ export default function FindWorkers({ onNavigateToMessages }) {
                 <WorkerProfileModal
                     worker={selectedWorker}
                     onClose={() => setSelectedWorker(null)}
-                    onHire={() => setSelectedWorker(null)}
-                    onMessage={() => setSelectedWorker(null)}
+                    onHire={() => {
+                        setSelectedWorker(null);
+                        if (onNavigateToMessages && selectedWorker?.user) {
+                            onNavigateToMessages({
+                                id: selectedWorker.user.id,
+                                name: selectedWorker.user.name
+                            });
+                        }
+                    }}
+                    onMessage={() => {
+                        setSelectedWorker(null);
+                        if (onNavigateToMessages && selectedWorker?.user) {
+                            onNavigateToMessages({
+                                id: selectedWorker.user.id,
+                                name: selectedWorker.user.name
+                            });
+                        }
+                    }}
                 />
             )}
         </div>

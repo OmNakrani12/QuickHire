@@ -15,7 +15,7 @@ export default function ApplicationsList({ JobId, onNavigateToMessages }) {
         const fetchApplications = async () => {
             try {
                 setLoading(true);
-                const cid = JSON.parse(localStorage.getItem("wid"));
+                const cid = JSON.parse(localStorage.getItem("cid"));
 
                 const res = await axios.get(
                     `${BASE_URL}/api/jobs/applications/contractor/${cid}`
@@ -162,7 +162,7 @@ export default function ApplicationsList({ JobId, onNavigateToMessages }) {
 
                                         <button
                                             className="btn btn-outline w-full"
-                                            onClick={() => setSelectedWorker(application.worker)}
+                                            onClick={() => setSelectedWorker({ ...application.worker, _appId: application.id })}
                                         >
                                             View Profile
                                         </button>
@@ -194,6 +194,18 @@ export default function ApplicationsList({ JobId, onNavigateToMessages }) {
                     <WorkerProfileModal
                         worker={selectedWorker}
                         onClose={() => setSelectedWorker(null)}
+                        onHire={(worker) => {
+                            if (worker._appId) {
+                                handleHire(worker._appId);
+                                setSelectedWorker(null);
+                            }
+                        }}
+                        onMessage={(worker) => {
+                            setSelectedWorker(null);
+                            if (onNavigateToMessages) {
+                                onNavigateToMessages({ id: worker.user.id, name: worker.user.name });
+                            }
+                        }}
                     />
                 </div>
             )}

@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.restController;
 
 import com.example.demo.dto.ContractorProfileUpdateDTO;
 import com.example.demo.services.ContractorService;
@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/contractors")
+@CrossOrigin(origins = "*")
 public class ContractorProfileController {
 
     private final ContractorService contractorService;

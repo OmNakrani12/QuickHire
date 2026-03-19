@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.restController;
 
 import com.example.demo.dto.WorkerProfileUpdateDTO;
 import com.example.demo.services.WorkerService;
@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/workers")
+@CrossOrigin(origins = "*")
 public class ProfileController {
 
     private final WorkerService workerService;

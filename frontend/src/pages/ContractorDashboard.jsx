@@ -26,7 +26,14 @@ export default function ContractorDashboard() {
     const { language, setLanguage, t } = useLanguage();
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
-    const [activeTab, setActiveTab] = useState('dashboard');
+    const [activeTab, setActiveTab] = useState(() => {
+        const savedTab = localStorage.getItem('dashboard_tab');
+        if (savedTab) {
+            localStorage.removeItem('dashboard_tab');
+            return savedTab;
+        }
+        return 'dashboard';
+    });
     const [showNewJobModal, setShowNewJobModal] = useState(false);
     const [messagingContact, setMessagingContact] = useState(null);
 
@@ -144,11 +151,13 @@ export default function ContractorDashboard() {
                 handleLogout={handleLogout}
             />
 
-            <main className="ml-64 flex-1 p-8">
-                <Header
-                    userName={user.name}
-                    onNewJobClick={() => setShowNewJobModal(true)}
-                />
+            <main className={` ml-72 flex-1 max-w-[1600px] mx-auto w-full ${activeTab === 'messages' ? 'h-screen p-0 flex flex-col overflow-hidden' : 'p-8'}`}>
+                {activeTab !== 'messages' && (
+                    <Header
+                        userName={user.name}
+                        onNewJobClick={() => setShowNewJobModal(true)}
+                    />
+                )}
 
                 {/* ── DASHBOARD OVERVIEW ── */}
                 {activeTab === 'dashboard' && (
@@ -207,7 +216,7 @@ export default function ContractorDashboard() {
                 )}
 
                 {activeTab === 'messages' && (
-                    <div className="animate-fade-in">
+                    <div className="animate-fade-in flex-1 min-h-0 h-full w-full">
                         <Messaging
                             otherUserId={messagingContact?.id}
                             otherUserName={messagingContact?.name}

@@ -57,7 +57,7 @@ export default function Projects() {
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [saving, setSaving] = useState(false);
 
-    const contractorId = localStorage.getItem("wid");
+    const contractorId = localStorage.getItem("cid");
 
     /* ── fetch ────────────────────────────────────────────── */
     const fetchProjects = async () => {
@@ -264,93 +264,130 @@ export default function Projects() {
     );
 }
 
-/* ─── ProjectCard ────────────────────────────────────────── */
+/* ─── Premium ProjectCard ────────────────────────────────────────── */
 function ProjectCard({ project, onEdit, onDelete }) {
     const statusMeta = {
-        active: { label: "Active", cls: "bg-green-100 text-green-700" },
-        paused: { label: "Paused", cls: "bg-yellow-100 text-yellow-700" },
-        completed: { label: "Completed", cls: "bg-secondary-100 text-secondary-700" },
+        active: { label: "Active", dot: "bg-green-500", box: "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/20" },
+        paused: { label: "Paused", dot: "bg-yellow-500", box: "bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/20" },
+        completed: { label: "Completed", dot: "bg-secondary-500", box: "bg-secondary-50 dark:bg-secondary-500/10 text-secondary-700 dark:text-secondary-400 border-secondary-200 dark:border-secondary-500/20" },
     };
-    const { label, cls } = statusMeta[project.status] || statusMeta.active;
+    const { label, dot, box } = statusMeta[project.status] || statusMeta.active;
     const skills = toSkillArray(project.skills);
     const budgetPct = project.budget > 0 ? Math.min(100, Math.round((project.spent / project.budget) * 100)) : 0;
     const deadlineStr = project.deadline
         ? new Date(project.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-        : "—";
+        : "No Deadline";
 
     return (
-        <div className="card p-6 flex flex-col gap-4">
-            {/* header */}
-            <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-slate-800 text-lg leading-tight">{project.name}</h3>
-                    {project.location && (
-                        <div className="flex items-center gap-1 text-slate-500 text-sm mt-1">
-                            <MapPin className="w-3.5 h-3.5 shrink-0 text-primary-400" />
-                            {project.location}
+        <div className="group relative bg-white dark:bg-slate-900/80 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800/60 overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-primary-500/30 dark:hover:border-primary-500/50 transition-all duration-300 flex flex-col backdrop-blur-sm">
+            
+            {/* Top Accent Gradient Line */}
+            <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${project.status === 'active' ? 'from-green-400 to-emerald-600' : project.status === 'completed' ? 'from-secondary-400 to-indigo-600' : 'from-yellow-400 to-orange-500'}`} />
+
+            <div className="p-6 flex flex-col h-full gap-5">
+                
+                {/* Header Section */}
+                <div className="flex justify-between items-start gap-4">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase border ${box}`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${dot} animate-pulse-slow`}></span>
+                                {label}
+                            </span>
+                            {project.location && (
+                                <span className="flex items-center gap-1 text-slate-400 dark:text-slate-500 text-xs font-medium truncate max-w-[200px]">
+                                    <MapPin className="w-3 h-3 shrink-0" /> <span className="truncate">{project.location}</span>
+                                </span>
+                            )}
                         </div>
-                    )}
+                        <h3 className="font-extrabold text-slate-900 dark:text-white text-xl truncate tracking-tight">
+                            {project.name}
+                        </h3>
+                    </div>
                 </div>
-                <span className={`shrink-0 px-2.5 py-1 text-xs font-semibold rounded-full ${cls}`}>{label}</span>
-            </div>
 
-            {project.description && (
-                <p className="text-slate-500 text-sm leading-relaxed line-clamp-2">{project.description}</p>
-            )}
+                {/* Description */}
+                {project.description && (
+                    <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
+                        {project.description}
+                    </p>
+                )}
 
-            {/* meta */}
-            <div className="grid grid-cols-3 gap-2 text-center">
-                <MetaBox icon={<Users className="w-4 h-4 text-primary-500" />} value={project.workers ?? 0} label="Workers" />
-                <MetaBox icon={<Calendar className="w-4 h-4 text-secondary-500" />} value={deadlineStr} label="Deadline" />
-                <MetaBox icon={<BarChart2 className="w-4 h-4 text-green-600" />} value={`${project.progress ?? 0}%`} label="Progress" />
-            </div>
-
-            {/* progress bar */}
-            <div>
-                <div className="flex justify-between text-xs text-slate-400 mb-1">
-                    <span>Project Progress</span><span>{project.progress ?? 0}%</span>
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-2 gap-3 mt-1">
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 transition-colors group-hover:bg-primary-50 dark:group-hover:bg-primary-900/10 group-hover:border-primary-100 dark:group-hover:border-primary-800/30">
+                        <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 flex items-center justify-center shrink-0">
+                            <Users className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Workers</p>
+                            <p className="font-bold text-slate-800 dark:text-slate-200 text-sm truncate">{project.workers || 0} Assigned</p>
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 transition-colors group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/10 group-hover:border-indigo-100 dark:group-hover:border-indigo-800/30">
+                        <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                            <Calendar className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Deadline</p>
+                            <p className="font-bold text-slate-800 dark:text-slate-200 text-sm truncate">{deadlineStr}</p>
+                        </div>
+                    </div>
                 </div>
-                <div className="w-full bg-slate-100 rounded-full h-2">
-                    <div className="h-2 rounded-full bg-gradient-to-r from-secondary-600 to-secondary-700 transition-all duration-500"
-                        style={{ width: `${project.progress ?? 0}%` }} />
-                </div>
-            </div>
 
-            {/* budget */}
-            <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-slate-500 flex items-center gap-1">
-                        <DollarSign className="w-3.5 h-3.5" /> Budget
-                    </span>
-                    <span className="text-xs font-semibold text-slate-700">
-                        ${Number(project.spent || 0).toLocaleString()} / ${Number(project.budget || 0).toLocaleString()}
-                    </span>
-                </div>
-                <div className="w-full bg-slate-200 rounded-full h-1.5">
-                    <div className={`h-1.5 rounded-full transition-all ${budgetPct >= 90 ? "bg-red-400" : "bg-gradient-to-r from-primary-500 to-primary-600"}`}
-                        style={{ width: `${budgetPct}%` }} />
-                </div>
-            </div>
+                {/* Progress & Budget Tracking */}
+                <div className="space-y-4">
+                    <div>
+                        <div className="flex justify-between items-end mb-1.5">
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Completion</span>
+                            <span className="text-sm font-black text-slate-800 dark:text-slate-200">{project.progress ?? 0}%</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full" style={{ width: `${project.progress ?? 0}%` }} />
+                        </div>
+                    </div>
 
-            {/* skills */}
-            {skills.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                    {skills.map((s, i) => (
-                        <span key={i} className="bg-primary-50 text-primary-700 border border-primary-100 text-xs px-2.5 py-0.5 rounded-full">{s}</span>
-                    ))}
+                    <div>
+                        <div className="flex justify-between items-end mb-1.5">
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Budget Usage</span>
+                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                <span className={budgetPct >= 90 ? "text-red-500 dark:text-red-400" : ""}>${Number(project.spent || 0).toLocaleString()}</span> / ${Number(project.budget || 0).toLocaleString()}
+                            </span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full transition-all ${budgetPct >= 90 ? "bg-red-500" : "bg-gradient-to-r from-emerald-400 to-emerald-600"}`} style={{ width: `${budgetPct}%` }} />
+                        </div>
+                    </div>
                 </div>
-            )}
 
-            {/* actions */}
-            <div className="flex gap-2 pt-2 border-t border-slate-100 mt-auto">
-                <button onClick={onEdit}
-                    className="btn btn-outline flex-1 py-2 text-sm flex items-center justify-center gap-1.5">
-                    <Edit2 className="w-3.5 h-3.5" /> Edit
-                </button>
-                <button onClick={onDelete}
-                    className="flex items-center justify-center gap-1.5 flex-1 py-2 text-sm rounded-lg font-semibold border-2 border-red-200 text-red-500 hover:bg-red-50 transition-all">
-                    <Trash2 className="w-3.5 h-3.5" /> Delete
-                </button>
+                <div className="flex-1" />
+
+                {/* Footer: Skills & Actions */}
+                <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-1.5 overflow-hidden">
+                        {skills.slice(0, 3).map((s, i) => (
+                            <span key={i} className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold uppercase tracking-wider rounded-md truncate max-w-[80px]">
+                                {s}
+                            </span>
+                        ))}
+                        {skills.length > 3 && (
+                            <span className="px-2 py-1 bg-slate-50 dark:bg-slate-800/50 text-slate-400 text-[10px] font-bold rounded-md">
+                                +{skills.length - 3}
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                        <button onClick={onEdit} className="p-2 text-slate-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-500/10 dark:hover:text-primary-400 rounded-xl transition-all" title="Edit Project">
+                            <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button onClick={onDelete} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 dark:hover:text-red-400 rounded-xl transition-all" title="Delete Project">
+                            <Trash2 className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+                
             </div>
         </div>
     );
@@ -361,9 +398,9 @@ function ProjectModal({ form, onChange, onSave, onClose, isEdit, saving }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
             style={{ backgroundColor: "rgba(15,23,42,0.65)", backdropFilter: "blur(6px)" }}>
-            <div className="bg-white w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 border dark:border-slate-800 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden">
                 {/* header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-primary-600 to-secondary-600">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-r from-primary-600 to-secondary-600">
                     <div className="flex items-center gap-2 text-white">
                         <Briefcase className="w-5 h-5" />
                         <h3 className="font-bold text-lg">{isEdit ? "Edit Project" : "New Project"}</h3>
@@ -378,19 +415,19 @@ function ProjectModal({ form, onChange, onSave, onClose, isEdit, saving }) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                         <div className="sm:col-span-2">
-                            <label className="block text-xs font-semibold text-slate-500 mb-1">Project Name *</label>
+                            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Project Name *</label>
                             <input name="name" value={form.name} onChange={onChange} required
                                 placeholder="e.g. Downtown Office Complex" className="input" />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-500 mb-1">Location</label>
+                            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Location</label>
                             <input name="location" value={form.location} onChange={onChange}
                                 placeholder="City, State" className="input" />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-500 mb-1">Status</label>
+                            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Status</label>
                             <select name="status" value={form.status} onChange={onChange} className="input">
                                 <option value="active">Active</option>
                                 <option value="paused">Paused</option>
@@ -399,30 +436,30 @@ function ProjectModal({ form, onChange, onSave, onClose, isEdit, saving }) {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-500 mb-1">Workers</label>
+                            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Workers</label>
                             <input type="number" min="0" name="workers" value={form.workers} onChange={onChange}
                                 placeholder="0" className="input" />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-500 mb-1">Deadline *</label>
+                            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Deadline *</label>
                             <input type="date" name="deadline" value={form.deadline ?? ""} onChange={onChange} required className="input" />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-500 mb-1">Budget ($) *</label>
+                            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Budget ($) *</label>
                             <input type="number" min="0" name="budget" value={form.budget} onChange={onChange} required
                                 placeholder="50000" className="input" />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-500 mb-1">Spent ($)</label>
+                            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Spent ($)</label>
                             <input type="number" min="0" name="spent" value={form.spent} onChange={onChange}
                                 placeholder="0" className="input" />
                         </div>
 
                         <div className="sm:col-span-2">
-                            <label className="block text-xs font-semibold text-slate-500 mb-1">
+                            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
                                 Progress: {form.progress}%
                             </label>
                             <input type="range" min="0" max="100" name="progress" value={form.progress} onChange={onChange}
@@ -430,13 +467,13 @@ function ProjectModal({ form, onChange, onSave, onClose, isEdit, saving }) {
                         </div>
 
                         <div className="sm:col-span-2">
-                            <label className="block text-xs font-semibold text-slate-500 mb-1">Skills (comma-separated)</label>
+                            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Skills (comma-separated)</label>
                             <input name="skills" value={form.skills} onChange={onChange}
                                 placeholder="e.g. Construction, Plumbing, Electrical" className="input" />
                         </div>
 
                         <div className="sm:col-span-2">
-                            <label className="block text-xs font-semibold text-slate-500 mb-1">Description</label>
+                            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Description</label>
                             <textarea name="description" value={form.description} onChange={onChange} rows={3}
                                 placeholder="Brief project description..." className="input resize-none" />
                         </div>
@@ -462,9 +499,9 @@ function ProjectModal({ form, onChange, onSave, onClose, isEdit, saving }) {
 function StatCard({ icon, label, value }) {
     return (
         <div className="card p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center">{icon}</div>
+            <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/60 flex items-center justify-center">{icon}</div>
             <div>
-                <p className="text-2xl font-bold text-slate-800 leading-tight">{value}</p>
+                <p className="text-2xl font-bold text-slate-800 dark:text-white leading-tight">{value}</p>
                 <p className="text-xs text-slate-400">{label}</p>
             </div>
         </div>
@@ -473,9 +510,9 @@ function StatCard({ icon, label, value }) {
 
 function MetaBox({ icon, value, label }) {
     return (
-        <div className="bg-slate-50 rounded-xl py-2.5 px-2 text-center border border-slate-100">
+        <div className="bg-slate-50 dark:bg-slate-800/80 rounded-xl py-2.5 px-2 text-center border border-slate-100 dark:border-slate-700/60">
             <div className="flex items-center justify-center gap-1 mb-0.5">{icon}</div>
-            <div className="text-sm font-bold text-slate-700">{value}</div>
+            <div className="text-sm font-bold text-slate-700 dark:text-slate-200">{value}</div>
             <div className="text-xs text-slate-400">{label}</div>
         </div>
     );

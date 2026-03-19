@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.demo.restController;
 
 import com.example.demo.entity.Contractor;
 import com.example.demo.repository.ContractorRepository;
@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/contractors")
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class ContractorController {
 
     private final ContractorRepository contractorRepository;

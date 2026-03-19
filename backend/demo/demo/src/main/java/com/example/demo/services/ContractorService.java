@@ -23,7 +23,7 @@ public class ContractorService {
     @Transactional
     public void updateProfile(String email, ContractorProfileUpdateDTO dto) {
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findFirstByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Contractor contractor = contractorRepository.findByUserId(user.getId())
@@ -75,7 +75,7 @@ public class ContractorService {
 
     public ContractorProfileUpdateDTO getProfile(String email) {
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findFirstByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Contractor contractor = contractorRepository.findByUserId(user.getId())

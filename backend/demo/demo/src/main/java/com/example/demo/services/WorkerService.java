@@ -1,4 +1,5 @@
 package com.example.demo.services;
+
 import com.example.demo.dto.WorkerProfileUpdateDTO;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Worker;
@@ -6,6 +7,7 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.WorkerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class WorkerService {
 
@@ -13,7 +15,7 @@ public class WorkerService {
     private final WorkerRepository workerRepository;
 
     public WorkerService(UserRepository userRepository,
-                         WorkerRepository workerRepository) {
+            WorkerRepository workerRepository) {
         this.userRepository = userRepository;
         this.workerRepository = workerRepository;
     }
@@ -21,7 +23,7 @@ public class WorkerService {
     @Transactional
     public void updateProfile(String email, WorkerProfileUpdateDTO dto) {
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findFirstByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Worker worker = workerRepository.findByUserId(user.getId())
@@ -61,12 +63,13 @@ public class WorkerService {
         if (dto.getCertifications() != null)
             worker.setCertifications(dto.getCertifications());
     }
+
     public WorkerProfileUpdateDTO getProfile(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findFirstByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Worker worker = workerRepository.findByUserId(user.getId())
-                .orElse(null);   // 🔥 No exception
+                .orElse(null); // 🔥 No exception
 
         WorkerProfileUpdateDTO dto = new WorkerProfileUpdateDTO();
 

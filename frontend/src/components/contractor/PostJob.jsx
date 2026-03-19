@@ -33,7 +33,7 @@ export default function PostJob() {
     const [myJobs, setMyJobs] = useState([]);
     const [loadingJobs, setLoadingJobs] = useState(false);
     const BASE_URL = import.meta.env.VITE_BACKEND_URL;
-    const cid = localStorage.getItem("wid");
+    const cid = localStorage.getItem("cid");
 
     useEffect(() => {
         fetchMyJobs();
@@ -116,7 +116,7 @@ export default function PostJob() {
                     </div>
                     <div>
                         <h2 className="text-2xl font-bold gradient-text">Post a New Job</h2>
-                        <p className="text-slate-500 text-sm">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">
                             Fill in the details below to publish a new job listing
                         </p>
                     </div>
@@ -288,7 +288,7 @@ export default function PostJob() {
 
                 {/* === Recent Postings Panel === */}
                 <div className="card p-6 flex flex-col gap-4 h-fit">
-                    <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                    <h3 className="font-bold text-slate-800 dark:text-white text-lg flex items-center gap-2">
                         <Briefcase className="w-5 h-5 text-secondary-600" />
                         My Recent Postings
                     </h3>
@@ -307,11 +307,11 @@ export default function PostJob() {
                             {myJobs.map((job) => (
                                 <div
                                     key={job.id}
-                                    className="p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-secondary-200 transition-all group"
+                                    className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-secondary-200 dark:hover:border-secondary-500 transition-all group"
                                 >
                                     <div className="flex items-start justify-between gap-2">
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-semibold text-slate-800 text-sm truncate">
+                                            <p className="font-semibold text-slate-800 dark:text-white text-sm truncate">
                                                 {job.title}
                                             </p>
                                             <div className="flex items-center gap-1 text-slate-500 text-xs mt-1">
@@ -354,7 +354,7 @@ export default function PostJob() {
 function FormField({ label, icon, hint, children }) {
     return (
         <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5 flex items-center gap-1.5">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
                 {icon}
                 {label}
             </label>

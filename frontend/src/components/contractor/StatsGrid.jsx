@@ -41,15 +41,24 @@ export default function StatsGrid({ stats }) {
     ];
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6">
             {cards.map(({ icon, value, label, bg }) => (
-                <div key={label} className="card p-5 flex flex-col gap-3 dark:bg-slate-800 border dark:border-slate-700">
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${bg} flex items-center justify-center shadow-md`}>
-                        {icon}
+                <div key={label} className="card p-5 sm:p-6 flex flex-col relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+                    <div className={`absolute -right-4 -top-4 w-20 h-20 bg-gradient-to-br ${bg} opacity-[0.08] dark:opacity-[0.15] rounded-full blur-xl group-hover:scale-150 transition-transform duration-500`}></div>
+                    
+                    <div className="relative z-10 mb-4">
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${bg} flex items-center justify-center shadow-lg shadow-slate-200/50 dark:shadow-none`}>
+                            {icon}
+                        </div>
                     </div>
-                    <div>
-                        <div className="text-2xl font-bold text-slate-800 dark:text-white leading-tight">{value}</div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{label}</div>
+                    
+                    <div className="relative z-10 mt-auto">
+                        <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-tight tracking-tight mb-1">
+                            {value}
+                        </div>
+                        <div className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 truncate">
+                            {label}
+                        </div>
                     </div>
                 </div>
             ))}
