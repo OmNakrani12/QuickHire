@@ -4,6 +4,7 @@ import { Briefcase, Mail, Lock, Loader2 } from "lucide-react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/config";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -31,6 +32,13 @@ export default function Login() {
       );
 
       const user = userCredential.user;
+
+      if (!user.emailVerified) {
+        // Redirect to verify email
+        navigate("/verify-email", { state: { formData: { ...formData, email: user.email } } });
+        return;
+      }
+
       console.log("Firebase login successful:", user);
       localStorage.setItem(
         "user",
@@ -39,27 +47,78 @@ export default function Login() {
           role: formData.role,
         })
       );
-      const data = await axios.get(`${BASE_URL}/api/users/email/${user.email}`);
-      localStorage.setItem("uid", data.data.id);
-      localStorage.setItem("user", JSON.stringify(data.data));
-      
+      await Cookies.set("auth_token", await user.getIdToken(), { secure: true, sameSite: "strict" });
+
       try {
-        const roleData = await axios.get(`${BASE_URL}/api/${formData.role}s/user/${data.data.id}`);
-        if (formData.role === "worker") {
-          localStorage.setItem("wid", roleData.data.id);
-        } else {
-          localStorage.setItem("cid", roleData.data.id);
+        const data = await axios.get(`${BASE_URL}/api/users/email/${user.email}`);
+        localStorage.setItem("uid", data.data.id);
+        localStorage.setItem("user", JSON.stringify(data.data));
+
+        try {
+          const roleData = await axios.get(`${BASE_URL}/api/${formData.role}s/user/${data.data.id}`);
+          if (formData.role === "worker") {
+            localStorage.setItem("wid", roleData.data.id);
+          } else {
+            localStorage.setItem("cid", roleData.data.id);
+          }
+        } catch (e) {
+          console.error("Could not fetch user role. Record might not exist yet.", e);
         }
-      } catch (e) {
-        console.error("Could not fetch user role. Record might not exist yet.", e);
+
+        console.log("User ID stored in localStorage:", data.data.id);
+        navigate(
+          formData.role === "worker"
+            ? "/worker/dashboard"
+            : "/contractor/dashboard"
+        );
+      } catch (backendError) {
+        // If 404, it means they verified email, but the backend record was never created.
+        // We must create it now to recover.
+        if (backendError.response && backendError.response.status === 404) {
+          const pendingStr = localStorage.getItem('pending_registration');
+          const pendingData = pendingStr ? JSON.parse(pendingStr) : {
+            name: user.displayName || "User",
+            email: user.email,
+            role: formData.role,
+            phone: ""
+          };
+
+          try {
+            const createRes = await axios.post(`${BASE_URL}/api/users`, {
+              uid: user.uid,
+              name: pendingData.name,
+              email: user.email,
+              role: pendingData.role,
+              phone: pendingData.phone,
+            });
+            const dbUser = createRes.data;
+            localStorage.setItem("uid", dbUser.id);
+            localStorage.setItem("user", JSON.stringify(dbUser));
+            localStorage.removeItem('pending_registration');
+
+            const roleRes = await axios.post(`${BASE_URL}/api/${pendingData.role}s`, {
+              user: { id: dbUser.id }
+            });
+            const roleData = roleRes.data;
+            if (pendingData.role === "worker") {
+              localStorage.setItem("wid", roleData.id);
+            } else {
+              localStorage.setItem("cid", roleData.id);
+            }
+
+            navigate(
+              pendingData.role === "worker"
+                ? "/worker/dashboard"
+                : "/contractor/dashboard"
+            );
+          } catch (createErr) {
+            console.error("Failed to recover user creation:", createErr);
+            setError("Failed to initialize your account. Please contact support.");
+          }
+        } else {
+          setError("An error occurred connecting to our servers.");
+        }
       }
-      
-      console.log("User ID stored in localStorage:", data.data.id);
-      navigate(
-        formData.role === "worker"
-          ? "/worker/dashboard"
-          : "/contractor/dashboard"
-      );
     } catch (err) {
       setError(getFriendlyError(err.code));
     } finally {
@@ -75,19 +134,39 @@ export default function Login() {
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,_rgba(99,102,241,0.15),transparent_60%)]"></div>
           <div className="absolute bottom-0 right-0 w-3/4 h-3/4 bg-[radial-gradient(circle_at_50%_50%,_rgba(16,185,129,0.1),transparent_50%)]"></div>
         </div>
-        
-        {/* CSS 3D Interactive Scene */}
-        <div className="relative z-10 perspective-1000 transform-3d">
-          <div className="relative w-80 h-80 sm:w-96 sm:h-96 animate-spin-slow-3d preserve-3d">
-            {/* Outer Box */}
-            <div className="absolute inset-0 border-[1px] border-indigo-500/20 rounded-3xl bg-indigo-500/5 backdrop-blur-sm" style={{ transform: 'rotateX(60deg) translateZ(-50px)' }}></div>
-            {/* Middle Circle */}
-            <div className="absolute inset-8 border border-emerald-400/30 rounded-full bg-emerald-400/5 backdrop-blur-md animate-pulse-slow" style={{ transform: 'rotateY(45deg) translateZ(50px)' }}></div>
-            {/* Inner Box */}
-            <div className="absolute inset-16 border-2 border-indigo-400/40 rounded-xl bg-indigo-500/10 backdrop-blur-lg" style={{ transform: 'rotateX(-30deg) rotateY(30deg) translateZ(80px)' }}></div>
-            
-            {/* Core Floating Object */}
-            <div className="absolute inset-1/2 -ml-8 -mt-8 w-16 h-16 bg-gradient-to-tr from-indigo-500 to-emerald-400 rounded-2xl shadow-[0_0_50px_rgba(99,102,241,0.6)] animate-float-3d" style={{ transform: 'translateZ(120px)' }}></div>
+
+        {/* Professional Minimalist 3D Core Scene */}
+        <div className="relative z-10 w-full flex items-center justify-center p-12">
+          <div className="relative w-72 h-72 sm:w-96 sm:h-96 flex items-center justify-center preserve-3d">
+            {/* Outer Orbital Rings */}
+            <div
+              className="absolute inset-0 rounded-full border border-slate-600/30 border-l-indigo-500/40 border-r-emerald-500/40"
+              style={{ transform: 'rotateX(65deg) rotateY(15deg)', animation: 'spin 15s linear infinite' }}
+            ></div>
+            <div
+              className="absolute inset-8 rounded-full border border-slate-600/20 border-t-indigo-400/30"
+              style={{ transform: 'rotateX(75deg) rotateY(-15deg)', animation: 'spin 10s linear infinite reverse' }}
+            ></div>
+
+            {/* Central Premium Glass Core */}
+            <div
+              className="relative w-36 h-36 rounded-full bg-gradient-to-br from-indigo-600 via-indigo-500 to-emerald-400 p-[1px] shadow-[0_0_60px_rgba(99,102,241,0.3)] animate-float-3d z-10"
+            >
+              <div className="w-full h-full rounded-full bg-slate-900/90 backdrop-blur-xl flex items-center justify-center border border-white/10 shadow-inner overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-emerald-500/10"></div>
+                <Briefcase className="w-10 h-10 text-slate-300 relative z-10" />
+              </div>
+            </div>
+
+            {/* Orbiting Tech Nodes */}
+            <div className="absolute w-full h-full" style={{ animation: 'spin 20s linear infinite' }}>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-slate-800 border border-indigo-500/40 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]" style={{ transform: 'rotateX(-65deg)' }}>
+                <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
+              </div>
+              <div className="absolute bottom-1/4 right-0 translate-x-1/2 w-10 h-10 rounded-full bg-slate-800 border border-emerald-500/40 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.4)]" style={{ transform: 'rotateX(-65deg)' }}>
+                <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -130,8 +209,8 @@ export default function Login() {
                   type="button"
                   onClick={() => setFormData({ ...formData, role: "worker" })}
                   className={`p-4 rounded-xl border-2 transition-all font-semibold ${formData.role === "worker"
-                      ? "border-primary-600 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 shadow-md shadow-primary-500/10"
-                      : "border-slate-200 dark:border-slate-800 text-slate-500 hover:border-primary-300 dark:hover:border-primary-700"
+                    ? "border-primary-600 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 shadow-md shadow-primary-500/10"
+                    : "border-slate-200 dark:border-slate-800 text-slate-500 hover:border-primary-300 dark:hover:border-primary-700"
                     }`}
                 >
                   Worker
@@ -141,8 +220,8 @@ export default function Login() {
                   type="button"
                   onClick={() => setFormData({ ...formData, role: "contractor" })}
                   className={`p-4 rounded-xl border-2 transition-all font-semibold ${formData.role === "contractor"
-                      ? "border-secondary-600 bg-secondary-50 dark:bg-secondary-900/30 text-secondary-700 dark:text-secondary-300 shadow-md shadow-secondary-500/10"
-                      : "border-slate-200 dark:border-slate-800 text-slate-500 hover:border-secondary-300 dark:hover:border-secondary-700"
+                    ? "border-secondary-600 bg-secondary-50 dark:bg-secondary-900/30 text-secondary-700 dark:text-secondary-300 shadow-md shadow-secondary-500/10"
+                    : "border-slate-200 dark:border-slate-800 text-slate-500 hover:border-secondary-300 dark:hover:border-secondary-700"
                     }`}
                 >
                   Contractor

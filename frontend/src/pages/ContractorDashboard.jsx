@@ -17,11 +17,12 @@ import Messaging from '../components/contractor/Messaging';
 import Loading from '../Loading';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Moon, Sun, Globe, LogOut } from 'lucide-react';
+import { Moon, Sun, Globe, LogOut, Menu, Briefcase } from 'lucide-react';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function ContractorDashboard() {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { theme, toggleTheme } = useTheme();
     const { language, setLanguage, t } = useLanguage();
     const navigate = useNavigate();
@@ -149,9 +150,24 @@ export default function ContractorDashboard() {
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 handleLogout={handleLogout}
+                isOpen={isMobileMenuOpen}
+                setIsOpen={setIsMobileMenuOpen}
             />
 
-            <main className={` ml-72 flex-1 max-w-[1600px] mx-auto w-full ${activeTab === 'messages' ? 'h-screen p-0 flex flex-col overflow-hidden' : 'p-8'}`}>
+            <main className={`lg:ml-72 flex-1 min-w-0 min-h-screen flex flex-col transition-all duration-300 ${activeTab === 'messages' ? 'p-0 overflow-hidden' : 'p-4 lg:p-8 overflow-y-auto'}`}>
+                {/* Mobile Header */}
+                <div className="lg:hidden w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center sticky top-0 z-30 mb-4">
+                    <div className="flex items-center space-x-2">
+                        <div className="p-2 bg-secondary-100 dark:bg-secondary-900/50 rounded-lg">
+                            <Briefcase className="w-5 h-5 text-secondary-600 dark:text-secondary-400" />
+                        </div>
+                        <span className="font-bold text-lg dark:text-white">QuickHire</span>
+                    </div>
+                    <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                        <Menu className="w-6 h-6" />
+                    </button>
+                </div>
+
                 {activeTab !== 'messages' && (
                     <Header
                         userName={user.name}
@@ -231,7 +247,7 @@ export default function ContractorDashboard() {
 
                             <div className="space-y-6">
                                 {/* Language Settings */}
-                                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-6">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-6 gap-4 sm:gap-0">
                                     <div className="flex items-start gap-4">
                                         <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
                                             <Globe className="w-5 h-5 text-blue-500" />
@@ -244,7 +260,7 @@ export default function ContractorDashboard() {
                                     <select
                                         value={language}
                                         onChange={(e) => setLanguage(e.target.value)}
-                                        className="px-4 py-2 border rounded-lg bg-white dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        className="px-4 py-2 border rounded-lg bg-white dark:bg-slate-800 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 w-full sm:w-auto ml-0 sm:ml-4"
                                     >
                                         <option value="English">English</option>
                                         <option value="Hindi">Hindi (हिंदी)</option>
@@ -253,7 +269,7 @@ export default function ContractorDashboard() {
                                 </div>
 
                                 {/* Theme Settings */}
-                                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-6">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-6 pt-6 sm:pt-0 gap-4 sm:gap-0">
                                     <div className="flex items-start gap-4">
                                         <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
                                             {theme === 'dark' ? <Moon className="w-5 h-5 text-indigo-400" /> : <Sun className="w-5 h-5 text-amber-500" />}
@@ -265,7 +281,7 @@ export default function ContractorDashboard() {
                                     </div>
                                     <button
                                         onClick={toggleTheme}
-                                        className={`w-14 h-7 rounded-full flex items-center transition-colors duration-300 focus:outline-none ${theme === 'dark' ? 'bg-indigo-500' : 'bg-slate-300'}`}
+                                        className={`w-14 h-7 rounded-full flex items-center transition-colors duration-300 focus:outline-none ml-14 sm:ml-4 ${theme === 'dark' ? 'bg-indigo-500' : 'bg-slate-300'}`}
                                     >
                                         <div className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-300 mx-1 ${theme === 'dark' ? 'translate-x-7' : 'translate-x-0'}`}></div>
                                     </button>

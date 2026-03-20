@@ -22,7 +22,18 @@ export default function ChatWindow({
         activeContactRef.current = activeContact;
     }, [activeContact]);
 
-    const [showContacts, setShowContacts] = useState(true);
+    const [showContacts, setShowContacts] = useState(!propsOtherUserId);
+
+    useEffect(() => {
+        if (propsOtherUserId) {
+            setActiveContact({
+                id: propsOtherUserId,
+                name: propsOtherUserName || "",
+            });
+            setShowContacts(false);
+        }
+    }, [propsOtherUserId, propsOtherUserName]);
+
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
     const [connected, setConnected] = useState(false);
@@ -58,10 +69,10 @@ export default function ChatWindow({
             }));
             setContacts(fetchedContacts);
 
-            // Auto-select first contact if none active
-            if (!activeContact.id && fetchedContacts.length > 0) {
+            // Auto-select first contact if none active AND not on mobile
+            if (!activeContactRef.current?.id && fetchedContacts.length > 0) {
                 setActiveContact({ id: fetchedContacts[0].id, name: fetchedContacts[0].name });
-                setShowContacts(false);
+                // We do not auto-hide contacts here so mobile users can see their list first
             }
         } catch (error) {
             console.error("Error loading contacts", error);

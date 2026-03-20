@@ -70,13 +70,13 @@ export default function ApplicationsList({ JobId, onNavigateToMessages }) {
                 <div className="card p-6">
                     <h2 className="text-2xl font-bold mb-6">Worker Applications</h2>
 
-                    <div className="mb-6 flex gap-4">
+                    <div className="mb-6 flex flex-col sm:flex-row gap-4">
                         <input
                             type="text"
                             placeholder="Search applications..."
-                            className="input flex-1"
+                            className="input flex-1 w-full"
                         />
-                        <select className="input w-48">
+                        <select className="input w-full sm:w-48">
                             <option>All Jobs</option>
                             <option>Office Renovation</option>
                             <option>Warehouse Construction</option>
@@ -86,10 +86,10 @@ export default function ApplicationsList({ JobId, onNavigateToMessages }) {
                     <div className="space-y-4">
                         {applications.filter(app => Number(app.jobId) === Number(JobId) || !JobId).map((application) => (
                             <div key={application.id} className="p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/50 rounded-xl shadow-sm hover:shadow-md transition">
-                                <div className="flex items-start justify-between gap-6">
+                                <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
 
                                     {/* LEFT SECTION */}
-                                    <div className="flex items-start gap-4 flex-1">
+                                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 flex-1 w-full text-center sm:text-left">
 
                                         {/* Avatar */}
                                         <div className="w-14 h-14 flex-shrink-0 bg-gradient-to-br from-primary-600 to-primary-700 rounded-full flex items-center justify-center text-white text-xl font-bold">
@@ -110,7 +110,7 @@ export default function ApplicationsList({ JobId, onNavigateToMessages }) {
                                             </p>
 
                                             {/* Rating + Experience */}
-                                            <div className="flex items-center gap-4 mb-3">
+                                            <div className="flex justify-center sm:justify-start items-center gap-4 mb-3">
                                                 <div className="flex items-center text-yellow-500">
                                                     <Star className="w-4 h-4 mr-1" />
                                                     <span className="font-medium text-slate-700 dark:text-slate-300">
@@ -124,7 +124,7 @@ export default function ApplicationsList({ JobId, onNavigateToMessages }) {
                                             </div>
 
                                             {/* Skills */}
-                                            <div className="flex flex-wrap gap-2 mb-3">
+                                            <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-3">
                                                 {application.skills.map((skill, index) => (
                                                     <span
                                                         key={index}
@@ -136,8 +136,8 @@ export default function ApplicationsList({ JobId, onNavigateToMessages }) {
                                             </div>
 
                                             {/* Cover Note */}
-                                            <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm text-slate-600 dark:text-slate-300">
-                                                <span className="font-medium text-slate-700 dark:text-slate-200">
+                                            <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm text-slate-600 dark:text-slate-300 text-left">
+                                                <span className="font-medium text-slate-700 dark:text-slate-200 block sm:inline">
                                                     Cover Note:
                                                 </span>{" "}
                                                 {application.coverNote || "No cover note provided"}
@@ -151,7 +151,7 @@ export default function ApplicationsList({ JobId, onNavigateToMessages }) {
                                     </div>
 
                                     {/* RIGHT SECTION BUTTONS */}
-                                    <div className="flex flex-col gap-2 w-40">
+                                    <div className="flex flex-col sm:flex-col gap-2 w-full sm:w-40 shrink-0">
 
                                         <button 
                                             className="btn btn-secondary w-full"

@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/contractor/Sidebar';
 import {
-    User, Mail, Phone, MapPin, Briefcase, Camera, Save, X, Building2, Calendar
+    User, Mail, Phone, MapPin, Briefcase, Camera, Save, X, Building2, Calendar, Menu
 } from 'lucide-react';
 
 export default function ContractorEditProfile() {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -91,9 +92,22 @@ export default function ContractorEditProfile() {
 
     return (
         <div className="min-h-screen flex bg-slate-50 dark:bg-slate-900 font-sans">
-            <Sidebar activeTab="profile" setActiveTab={handleSidebarNav} handleLogout={() => { localStorage.removeItem('user'); navigate('/'); }} />
-            
-            <main className="ml-72 flex-1 overflow-y-auto pb-16">
+            <Sidebar activeTab="profile" setActiveTab={handleSidebarNav} handleLogout={() => { localStorage.removeItem('user'); navigate('/'); }} isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
+
+            <main className="lg:ml-72 flex-1 min-w-0 overflow-x-hidden overflow-y-auto pb-16">
+                {/* Mobile Header */}
+                <div className="lg:hidden w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center sticky top-0 z-30">
+                    <div className="flex items-center space-x-2">
+                        <div className="p-2 bg-secondary-100 dark:bg-secondary-900/50 rounded-lg">
+                            <Briefcase className="w-5 h-5 text-secondary-600 dark:text-secondary-400" />
+                        </div>
+                        <span className="font-bold text-lg dark:text-white">QuickHire</span>
+                    </div>
+                    <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                        <Menu className="w-6 h-6" />
+                    </button>
+                </div>
+
                 {/* Cover Banner */}
                 <div className="h-64 w-full bg-gradient-to-r from-secondary-600 via-blue-600 to-cyan-700 relative shadow-sm">
                     {/* Floating Save Actions */}
@@ -109,42 +123,42 @@ export default function ContractorEditProfile() {
                 </div>
 
                 <div className="max-w-[1400px] mx-auto px-8 -mt-24 flex flex-col xl:flex-row gap-8 relative z-10">
-                    
+
                     {/* Left Column: Avatar & Summary */}
                     <div className="w-full xl:w-[350px] shrink-0">
-                         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-6 flex flex-col items-center animate-fade-in transition-all">
-                              <div className="relative -mt-20 mb-4 group">
-                                  {photoPreview ? (
-                                        <img src={photoPreview} alt="Profile" className="w-40 h-40 rounded-full object-cover shadow-2xl border-[6px] border-white dark:border-slate-800 bg-white" />
-                                    ) : (
-                                        <div className="w-40 h-40 bg-gradient-to-br from-secondary-600 to-blue-700 rounded-full flex items-center justify-center text-white text-5xl font-bold shadow-2xl border-[6px] border-white dark:border-slate-800">
-                                            {formData.name.charAt(0) || 'C'}
-                                        </div>
-                                  )}
-                                  <input type="file" id="photo-upload" accept="image/*" onChange={handlePhotoChange} className="hidden" />
-                                  <button type="button" onClick={() => document.getElementById('photo-upload').click()} className="absolute bottom-2 right-2 p-3 bg-secondary-600 hover:bg-secondary-700 text-white rounded-full shadow-lg transition-transform hover:scale-110 border-4 border-white dark:border-slate-800">
-                                      <Camera className="w-5 h-5" />
-                                  </button>
-                              </div>
-                              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 text-center">{formData.companyName || formData.name || 'Your Company'}</h2>
-                              <p className="text-slate-500 dark:text-slate-400 font-medium mb-6 text-center">{formData.location || 'Company Location'}</p>
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-6 flex flex-col items-center animate-fade-in transition-all">
+                            <div className="relative -mt-20 mb-4 group">
+                                {photoPreview ? (
+                                    <img src={photoPreview} alt="Profile" className="w-40 h-40 rounded-full object-cover shadow-2xl border-[6px] border-white dark:border-slate-800 bg-white" />
+                                ) : (
+                                    <div className="w-40 h-40 bg-gradient-to-br from-secondary-600 to-blue-700 rounded-full flex items-center justify-center text-white text-5xl font-bold shadow-2xl border-[6px] border-white dark:border-slate-800">
+                                        {formData.name.charAt(0) || 'C'}
+                                    </div>
+                                )}
+                                <input type="file" id="photo-upload" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                                <button type="button" onClick={() => document.getElementById('photo-upload').click()} className="absolute bottom-2 right-2 p-3 bg-secondary-600 hover:bg-secondary-700 text-white rounded-full shadow-lg transition-transform hover:scale-110 border-4 border-white dark:border-slate-800">
+                                    <Camera className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 text-center">{formData.companyName || formData.name || 'Your Company'}</h2>
+                            <p className="text-slate-500 dark:text-slate-400 font-medium mb-6 text-center">{formData.location || 'Company Location'}</p>
 
 
-                         </div>
+                        </div>
                     </div>
 
                     {/* Right Column: Forms */}
                     <div className="flex-1 space-y-6">
-                         
-                         {/* Personal Information */}
-                         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-8 animate-fade-in delay-75">
-                             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700/50">
-                                 <div className="p-2.5 bg-secondary-50 dark:bg-secondary-900/30 rounded-xl">
-                                     <User className="w-5 h-5 text-secondary-600 dark:text-secondary-400" />
-                                 </div>
-                                 <h3 className="text-xl font-bold text-slate-800 dark:text-white">Admin Information</h3>
-                             </div>
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+
+                        {/* Personal Information */}
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-8 animate-fade-in delay-75">
+                            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700/50">
+                                <div className="p-2.5 bg-secondary-50 dark:bg-secondary-900/30 rounded-xl">
+                                    <User className="w-5 h-5 text-secondary-600 dark:text-secondary-400" />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Admin Information</h3>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Full Name</label>
                                     <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="input w-full dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200" placeholder="John Doe" />
@@ -174,18 +188,18 @@ export default function ContractorEditProfile() {
                                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Bio</label>
                                     <textarea name="bio" value={formData.bio} onChange={handleInputChange} rows="4" className="input w-full resize-none dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200" placeholder="Tell workers about your company and what makes you a great employer..." />
                                 </div>
-                             </div>
-                         </div>
+                            </div>
+                        </div>
 
-                         {/* Company Information */}
-                         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-8 animate-fade-in delay-100">
-                             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700/50">
-                                 <div className="p-2.5 bg-secondary-50 dark:bg-secondary-900/30 rounded-xl">
-                                     <Building2 className="w-5 h-5 text-secondary-600 dark:text-secondary-400" />
-                                 </div>
-                                 <h3 className="text-xl font-bold text-slate-800 dark:text-white">Company Information</h3>
-                             </div>
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                        {/* Company Information */}
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700/60 p-8 animate-fade-in delay-100">
+                            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700/50">
+                                <div className="p-2.5 bg-secondary-50 dark:bg-secondary-900/30 rounded-xl">
+                                    <Building2 className="w-5 h-5 text-secondary-600 dark:text-secondary-400" />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Company Information</h3>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Company Name</label>
                                     <input type="text" name="companyName" value={formData.companyName} onChange={handleInputChange} className="input w-full dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200" placeholder="ABC Construction Inc." />
@@ -219,8 +233,8 @@ export default function ContractorEditProfile() {
                                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Website</label>
                                     <input type="url" name="website" value={formData.website} onChange={handleInputChange} className="input w-full dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200" placeholder="https://www.example.com" />
                                 </div>
-                             </div>
-                         </div>
+                            </div>
+                        </div>
 
                     </div>
                 </div>

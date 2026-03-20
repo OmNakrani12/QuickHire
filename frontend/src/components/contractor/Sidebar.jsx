@@ -11,12 +11,26 @@ import {
     PlusCircle,
 } from 'lucide-react';
 
-export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
+export default function Sidebar({ activeTab, setActiveTab, handleLogout, isOpen, setIsOpen }) {
     const { t } = useLanguage();
+
+    const handleNavigation = (tab) => {
+        setActiveTab(tab);
+        if (setIsOpen) setIsOpen(false);
+    };
+
     return (
-        <aside className="w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/60 dark:border-slate-800/60 fixed h-full z-20 flex flex-col transition-all duration-300 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+        <>
+            {/* Mobile Overlay */}
+            {isOpen && (
+                <div 
+                    className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
+            <aside className={`w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/60 dark:border-slate-800/60 fixed inset-y-0 left-0 h-full z-50 flex flex-col transition-transform duration-300 shadow-[4px_0_24px_rgba(0,0,0,0.02)] ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
             <div className="p-6 border-b border-slate-100 dark:border-slate-800/50">
-                <Link to="/" className="flex items-center space-x-3 group">
+                <Link to="/" onClick={() => setIsOpen && setIsOpen(false)} className="flex items-center space-x-3 group">
                     <div className="p-2.5 bg-secondary-50 dark:bg-secondary-900/30 rounded-xl group-hover:scale-110 group-hover:bg-secondary-100 dark:group-hover:bg-secondary-900/50 transition-all">
                         <Briefcase className="w-7 h-7 text-secondary-600 dark:text-secondary-400" />
                     </div>
@@ -29,7 +43,7 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                     <p className="px-4 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">Menu</p>
                     <nav className="space-y-1.5">
                         <button
-                            onClick={() => setActiveTab('dashboard')}
+                            onClick={() => handleNavigation('dashboard')}
                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === 'dashboard'
                                 ? 'bg-secondary-600 text-white shadow-md shadow-secondary-500/20'
                                 : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
@@ -40,7 +54,7 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                         </button>
 
                         <button
-                            onClick={() => setActiveTab('jobs')}
+                            onClick={() => handleNavigation('jobs')}
                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === 'jobs'
                                 ? 'bg-secondary-600 text-white shadow-md shadow-secondary-500/20'
                                 : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
@@ -51,7 +65,7 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                         </button>
 
                         <button
-                            onClick={() => setActiveTab('projects')}
+                            onClick={() => handleNavigation('projects')}
                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === 'projects'
                                 ? 'bg-secondary-600 text-white shadow-md shadow-secondary-500/20'
                                 : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
@@ -62,7 +76,7 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                         </button>
 
                         <button
-                            onClick={() => setActiveTab('workers')}
+                            onClick={() => handleNavigation('workers')}
                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === 'workers'
                                 ? 'bg-secondary-600 text-white shadow-md shadow-secondary-500/20'
                                 : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
@@ -73,7 +87,7 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                         </button>
                         
                         <button
-                            onClick={() => setActiveTab('post-job')}
+                            onClick={() => handleNavigation('post-job')}
                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === 'post-job'
                                 ? 'bg-secondary-600 text-white shadow-md shadow-secondary-500/20'
                                 : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
@@ -84,7 +98,7 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                         </button>
 
                         <button
-                            onClick={() => setActiveTab('applications')}
+                            onClick={() => handleNavigation('applications')}
                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === 'applications'
                                 ? 'bg-secondary-600 text-white shadow-md shadow-secondary-500/20'
                                 : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
@@ -100,7 +114,7 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                     <p className="px-4 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">Preferences</p>
                     <nav className="space-y-1.5">
                         <button
-                            onClick={() => setActiveTab('messages')}
+                            onClick={() => handleNavigation('messages')}
                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === 'messages'
                                 ? 'bg-secondary-600 text-white shadow-md shadow-secondary-500/20'
                                 : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
@@ -111,7 +125,7 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                         </button>
                         
                         <button
-                            onClick={() => setActiveTab('profile')}
+                            onClick={() => handleNavigation('profile')}
                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === 'profile'
                                 ? 'bg-secondary-600 text-white shadow-md shadow-secondary-500/20'
                                 : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
@@ -122,7 +136,7 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                         </button>
 
                         <button
-                            onClick={() => setActiveTab('settings')}
+                            onClick={() => handleNavigation('settings')}
                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === 'settings'
                                 ? 'bg-secondary-600 text-white shadow-md shadow-secondary-500/20'
                                 : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
@@ -135,5 +149,6 @@ export default function Sidebar({ activeTab, setActiveTab, handleLogout }) {
                 </div>
             </div>
         </aside>
+        </>
     );
 }

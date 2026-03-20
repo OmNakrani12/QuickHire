@@ -6,6 +6,8 @@ import WorkerDashboard from './pages/WorkerDashboard';
 import ContractorDashboard from './pages/ContractorDashboard';
 import EditProfile from './pages/EditProfile';
 import ContractorEditProfile from './pages/ContractorEditProfile';
+import VerifyEmail from './pages/VerifyEmail';
+import ForgotPassword from './pages/ForgotPassword';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 
@@ -17,6 +19,8 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/verify-email" element={<VerifyEmail />} />
                     <Route path="/worker/dashboard" element={<WorkerDashboard />} />
                     <Route path="/worker/edit-profile" element={<EditProfile />} />
                     <Route path="/contractor/dashboard" element={<ContractorDashboard />} />

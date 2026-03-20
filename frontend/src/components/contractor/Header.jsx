@@ -9,7 +9,7 @@ export default function Header({ userName, onNewJobClick }) {
 
     return (
         <>
-            <header className="flex items-center justify-between mb-6 pb-6 mt-2 border-b border-slate-200/50 dark:border-slate-800/50 sticky top-0 z-10 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-xl pt-6 -mt-8 px-2 gap-4">
+            <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 pb-6 mt-2 border-b border-slate-200/50 dark:border-slate-800/50 sticky top-0 z-10 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-xl pt-6 -mt-8 px-2 gap-4">
                 <div>
                     <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-1 tracking-tight">
                         {t('welcomeBack')}, <span className="text-secondary-600 dark:text-secondary-400">{userName}</span>!

@@ -12,6 +12,8 @@
     "@stomp/stompjs": "^7.3.0",
     "axios": "^1.13.5",
     "firebase": "^12.9.0",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -49,26 +49,25 @@ export default function ContractorProfileView() {
 
   return (
     <div className="space-y-6 dark:bg-slate-800 animate-fade-in">
-      <div className="card p-8 dark:bg-slate-800 border dark:border-slate-700">
-        <div className="flex items-start space-x-6 mb-8">
-
+      <div className="card p-6 sm:p-8 dark:bg-slate-800 border dark:border-slate-700">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 text-center md:text-left">
           {/* Profile Photo */}
           {user.profilePhoto ? (
             <img
               src={user.profilePhoto}
               alt="Profile"
-              className="w-24 h-24 rounded-full object-cover shadow-md"
+              className="w-24 h-24 rounded-full object-cover shadow-md shrink-0"
             />
           ) : (
-            <div className="w-24 h-24 bg-gradient-to-br from-secondary-600 to-secondary-700 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-md">
+            <div className="w-24 h-24 shrink-0 bg-gradient-to-br from-secondary-600 to-secondary-700 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-md">
               {user.name?.charAt(0) || "C"}
             </div>
           )}
 
-          <div className="flex-1">
+          <div className="flex-1 flex flex-col items-center md:items-start">
 
             {/* Name + Verified */}
-            <div className="flex items-center space-x-3 mb-2">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-2">
               <h2 className="text-2xl font-bold dark:text-white">
                 {user.name || "Contractor"}
               </h2>
@@ -96,7 +95,7 @@ export default function ContractorProfileView() {
           {/* Edit Button */}
           <button
             onClick={() => navigate("/contractor/edit-profile")}
-            className="btn btn-outline dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+            className="btn btn-outline w-full md:w-auto dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
           >
             Edit Profile
           </button>

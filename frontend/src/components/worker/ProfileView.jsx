@@ -46,10 +46,10 @@ export default function ProfileView() {
     <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
 
       {/* ================= HEADER ================= */}
-      <div className="card p-8 shadow-md rounded-2xl dark:bg-slate-900/80 dark:border-slate-800">
-        <div className="flex items-start justify-between">
+      <div className="card p-6 sm:p-8 shadow-md rounded-2xl dark:bg-slate-900/80 dark:border-slate-800">
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
 
-          <div className="flex items-start space-x-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left">
             {/* Profile Image */}
             {user.profilePhoto ? (
               <img
@@ -63,9 +63,9 @@ export default function ProfileView() {
               </div>
             )}
 
-            <div>
+            <div className="flex flex-col items-center sm:items-start">
               {/* Name + Verified */}
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
                 <h2 className="text-3xl font-bold dark:text-white">
                   {user.name}
                 </h2>
@@ -94,7 +94,7 @@ export default function ProfileView() {
           {/* Edit Button */}
           <button
             onClick={() => navigate("/worker/edit-profile")}
-            className="btn btn-outline"
+            className="btn btn-outline w-full md:w-auto"
           >
             Edit Profile
           </button>

@@ -14,11 +14,11 @@ export default function Home() {
                             </div>
                             <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">QuickHire</span>
                         </Link>
-                        <div className="flex items-center space-x-6">
-                            <Link to="/login" className="text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 font-semibold transition-colors">
+                        <div className="flex items-center space-x-3 sm:space-x-6">
+                            <Link to="/login" className="hidden sm:block text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-400 font-semibold transition-colors">
                                 Log In
                             </Link>
-                            <Link to="/signup" className="btn btn-primary px-6 py-2.5 shadow-md shadow-primary-500/20">
+                            <Link to="/signup" className="btn btn-primary px-4 sm:px-6 py-2 sm:py-2.5 shadow-md shadow-primary-500/20 text-sm sm:text-base">
                                 Get Started
                             </Link>
                         </div>
@@ -44,7 +44,7 @@ export default function Home() {
                             <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Over 10,000 active jobs available right now</span>
                         </div>
                         
-                        <h1 className="text-5xl md:text-7xl font-extrabold mb-8 leading-tight tracking-tight text-slate-900 dark:text-white">
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-8 leading-tight tracking-tight text-slate-900 dark:text-white">
                             The Professional <br className="hidden md:block" />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-emerald-500">
                                 Labor Network

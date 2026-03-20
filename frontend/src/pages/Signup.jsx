@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, Mail, Lock, User, Loader2, Phone } from "lucide-react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth, googleProvider } from "../firebase/config";
 import { signInWithPopup } from "firebase/auth";
 import { FcGoogle } from "react-icons/fc";
@@ -136,57 +136,16 @@ export default function SignupPage() {
             );
 
             const user = userCredential.user;
-            console.log("User created:", user);
+            console.log("Firebase user created:", user);
 
-            const res = await fetch(`${BASE_URL}/api/users`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    uid: user.uid,
-                    name: formData.name,
-                    email: formData.email,
-                    role: formData.role,
-                    phone: formData.phone,
-                }),
-            });
-            const dbUser = await res.json();
+            // Send Firebase Email Verification Link
+            await sendEmailVerification(user);
+            
+            // Store registration details temporarily in localStorage
+            localStorage.setItem('pending_registration', JSON.stringify(formData));
 
-            localStorage.setItem(
-                "user",
-                JSON.stringify({
-                    ...dbUser,
-                    uid: user.uid,
-                })
-            );
-            localStorage.setItem("uid", dbUser.id);
-
-            // Create the specific role record to put wid/cid in local storage
-            try {
-                const roleRes = await fetch(`${BASE_URL}/api/${formData.role}s`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ user: { id: dbUser.id } })
-                });
-                
-                if (roleRes.ok) {
-                    const roleData = await roleRes.json();
-                    if (formData.role === "worker") {
-                        localStorage.setItem("wid", roleData.id);
-                    } else {
-                        localStorage.setItem("cid", roleData.id);
-                    }
-                }
-            } catch (e) {
-                console.error("Failed to create role database entry:", e);
-            }
-
-            if (formData.role === "worker") {
-                navigate("/worker/dashboard");
-            } else {
-                navigate("/contractor/dashboard");
-            }
+            // Redirect to verify-email
+            navigate("/verify-email", { state: { formData } });
 
         } catch (error) {
             console.error(error);
@@ -205,19 +164,39 @@ export default function SignupPage() {
                     <div className="absolute bottom-0 left-0 w-3/4 h-3/4 bg-[radial-gradient(circle_at_50%_50%,_rgba(99,102,241,0.1),transparent_50%)]"></div>
                 </div>
 
-                {/* CSS 3D Interactive Scene (Mirrored/Different variant) */}
-                <div className="relative z-10 perspective-1000 transform-3d">
-                    <div className="relative w-80 h-80 sm:w-96 sm:h-96 animate-spin-slow-3d preserve-3d" style={{ animationDirection: 'reverse' }}>
-                        {/* Outer Box */}
-                        <div className="absolute inset-0 border-[1px] border-emerald-500/20 rounded-full bg-emerald-500/5 backdrop-blur-sm" style={{ transform: 'rotateX(-60deg) translateZ(50px)' }}></div>
-                        {/* Middle Circle */}
-                        <div className="absolute inset-8 border-2 border-indigo-400/30 rounded-3xl bg-indigo-400/5 backdrop-blur-md animate-pulse-slow" style={{ transform: 'rotateY(-45deg) translateZ(-50px)' }}></div>
-                        {/* Inner Box */}
-                        <div className="absolute inset-16 border border-emerald-400/40 rounded-full bg-emerald-500/10 backdrop-blur-lg" style={{ transform: 'rotateX(30deg) rotateY(-30deg) translateZ(-80px)' }}></div>
-                        
-                        {/* Core Floating Object */}
-                        <div className="absolute inset-1/2 -ml-8 -mt-8 w-16 h-16 bg-gradient-to-tr from-emerald-400 to-indigo-500 rounded-full shadow-[0_0_50px_rgba(16,185,129,0.6)] animate-float-3d" style={{ transform: 'translateZ(-120px)' }}></div>
-                    </div>
+                {/* Professional Minimalist 3D Core Scene */}
+                <div className="relative z-10 w-full flex items-center justify-center p-12">
+                   <div className="relative w-72 h-72 sm:w-96 sm:h-96 flex items-center justify-center preserve-3d">
+                      {/* Outer Orbital Rings */}
+                      <div 
+                         className="absolute inset-0 rounded-full border border-slate-600/30 border-l-emerald-500/40 border-r-indigo-500/40" 
+                         style={{ transform: 'rotateX(65deg) rotateY(-15deg)', animation: 'spin 15s linear infinite reverse' }}
+                      ></div>
+                      <div 
+                         className="absolute inset-8 rounded-full border border-slate-600/20 border-t-emerald-400/30" 
+                         style={{ transform: 'rotateX(75deg) rotateY(15deg)', animation: 'spin 10s linear infinite' }}
+                      ></div>
+                      
+                      {/* Central Premium Glass Core */}
+                      <div 
+                         className="relative w-36 h-36 rounded-full bg-gradient-to-bl from-emerald-500 via-emerald-400 to-indigo-500 p-[1px] shadow-[0_0_60px_rgba(16,185,129,0.3)] animate-float-3d z-10"
+                      >
+                         <div className="w-full h-full rounded-full bg-slate-900/90 backdrop-blur-xl flex items-center justify-center border border-white/10 shadow-inner overflow-hidden relative">
+                            <div className="absolute inset-0 bg-gradient-to-bl from-emerald-500/10 to-indigo-500/10"></div>
+                            <User className="w-10 h-10 text-slate-300 relative z-10" />
+                         </div>
+                      </div>
+
+                      {/* Orbiting Tech Nodes */}
+                      <div className="absolute w-full h-full" style={{ animation: 'spin 20s linear infinite reverse' }}>
+                         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-800 border border-emerald-500/40 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.4)]" style={{ transform: 'rotateX(-65deg)' }}>
+                            <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></div>
+                         </div>
+                         <div className="absolute bottom-1/4 left-0 -translate-x-1/2 w-10 h-10 rounded-lg bg-slate-800 border border-indigo-500/40 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]" style={{ transform: 'rotateX(-65deg)' }}>
+                            <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
+                         </div>
+                      </div>
+                   </div>
                 </div>
 
                 <div className="absolute bottom-12 text-center w-full px-12 text-slate-400 font-medium z-20">
