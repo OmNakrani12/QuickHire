@@ -38,7 +38,7 @@ public class ChatMessage {
     public Long getSenderId() {
         return senderId;
     }
-
+    
     public void setSenderId(Long senderId) {
         this.senderId = senderId;
     }

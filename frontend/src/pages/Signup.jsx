@@ -293,7 +293,12 @@ export default function SignupPage() {
                                     minLength={10}
                                     maxLength={10}
                                     value={formData.phone}
-                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (/^\d*$/.test(value)) {
+                                            setFormData({ ...formData, phone: value });
+                                        }
+                                    }}
                                     className="input pl-12 py-3.5 text-base"
                                     placeholder="1234567890"
                                 />
