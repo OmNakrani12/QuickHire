@@ -67,7 +67,7 @@ export default function ContractorDashboard() {
     }, [user]);
 
     const fetchDashboardData = async () => {
-        const contractorId = localStorage.getItem('uid');
+        const contractorId = localStorage.getItem('cid');
         if (!contractorId) return;
 
         setDashboardLoading(true);
@@ -104,16 +104,30 @@ export default function ContractorDashboard() {
             const workerIds = new Set(apps.map(a => a.worker?.id).filter(Boolean));
 
             // format recent 3 apps for the dashboard widget
-            const formattedApps = apps.slice(0, 3).map(app => ({
-                id: app.id,
-                name: app.worker?.user?.name || 'Worker',
-                job: app.job?.title || '—',
-                rating: app.worker?.rating ?? 'N/A',
-                completedJobs: app.worker?.experience ?? 0,
-                skills: app.job?.skillsRequired ? app.job.skillsRequired.split(',').map(s => s.trim()) : [],
-                appliedDate: app.appliedAt ? app.appliedAt.split('T')[0] : '—',
-                status: app.status,
-                worker: app.worker,
+            const formattedApps = await Promise.all(apps.slice(0, 3).map(async (app) => {
+                let avgRating = 'N/A';
+                try {
+                    const reviewRes = await axios.get(`${BASE_URL}/api/reviews/user/${app.worker.user.id}`);
+                    const reviews = reviewRes.data;
+                    if (reviews.length > 0) {
+                        const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+                        avgRating = (sum / reviews.length).toFixed(1);
+                    }
+                } catch (e) {
+                    console.error("Error fetching worker rating:", e);
+                }
+
+                return {
+                    id: app.id,
+                    name: app.worker?.user?.name || 'Worker',
+                    job: app.job?.title || '—',
+                    rating: avgRating,
+                    completedJobs: app.worker?.experience ?? 0,
+                    skills: app.job?.skillsRequired ? app.job.skillsRequired.split(',').map(s => s.trim()) : [],
+                    appliedDate: app.appliedAt ? app.appliedAt.split('T')[0] : '—',
+                    status: app.status,
+                    worker: app.worker,
+                };
             }));
             setRecentApplications(formattedApps);
 

@@ -4,6 +4,7 @@ import Sidebar from '../components/contractor/Sidebar';
 import {
     User, Mail, Phone, MapPin, Briefcase, Camera, Save, X, Building2, Calendar, Menu
 } from 'lucide-react';
+import axios from 'axios';
 
 export default function ContractorEditProfile() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -57,20 +58,41 @@ export default function ContractorEditProfile() {
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
         if (file && file.type.startsWith('image/')) {
+            setProfilePhoto(file);
             const reader = new FileReader();
             reader.onloadend = () => setPhotoPreview(reader.result);
             reader.readAsDataURL(file);
         }
     };
+    const uploadImage = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        console.log("Uploading image with formData:", formData.get("file"));
+        const res = await axios.post(
+            `${BASE_URL}/api/upload`,
+            formData,   // ✅ correct
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }
+        );
 
+        return res.data;
+    };
     const handleSave = async () => {
         setIsSaving(true);
         try {
+            let imageUrl = user.profilePhoto;
+            if (profilePhoto) {
+                imageUrl = await uploadImage(profilePhoto);
+            }
+
             await fetch(`${BASE_URL}/api/contractors/profile/${formData.email}`, {
                 method: "PATCH", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...formData, yearsInBusiness: formData.yearsInBusiness === '' ? null : formData.yearsInBusiness, profilePhoto: photoPreview }),
+                body: JSON.stringify({ ...formData, yearsInBusiness: formData.yearsInBusiness === '' ? null : formData.yearsInBusiness, profilePhoto: imageUrl }),
             });
-            const updatedUser = { ...user, ...formData, profilePhoto: photoPreview || user.profilePhoto };
+            const updatedUser = { ...user, ...formData, profilePhoto: imageUrl };
             localStorage.setItem('user', JSON.stringify(updatedUser));
             setIsSaving(false);
             navigate('/contractor/dashboard');

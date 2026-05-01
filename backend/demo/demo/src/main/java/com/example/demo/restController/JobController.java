@@ -30,8 +30,22 @@ public class JobController {
         this.applicationRepository = applicationRepository;
         this.workerRepository = workerRepository;
     }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteJob(@PathVariable Long id) {
+        if (!jobRepository.existsById(id)) {
+            return ResponseEntity
+                    .status(404)
+                    .body(Map.of("message", "Job not found"));
+        }
 
-    // ── Create job ───────────────────────────────────────────────────────────
+        applicationRepository.deleteAll(applicationRepository.findByJobId(id));
+
+        jobRepository.deleteById(id);
+
+        return ResponseEntity.ok(Map.of("message", "Job deleted successfully"));
+    }
+
     @PostMapping
     public ResponseEntity<Job> createJob(@RequestBody Job job) {
         Job savedJob = jobRepository.save(job);

@@ -2,6 +2,7 @@ import axios from "axios";
 import { Search, MapPin, Clock, Loader2, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import JobApplicationModal from "./JobApplicationModal";
+import Loading from "@/Loading";
 
 export default function AvailableJobs() {
   const [jobs, setJobs] = useState([]);
@@ -48,14 +49,7 @@ export default function AvailableJobs() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-primary-600 mx-auto animate-spin" />
-          <p className="mt-4 text-lg text-slate-600">Loading available jobs...</p>
-        </div>
-      </div>
-    );
+    return <Loading/>
   }
 
   return (

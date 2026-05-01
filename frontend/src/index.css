@@ -244,3 +244,61 @@
   -ms-overflow-style: none;  /* IE/Edge */
   scrollbar-width: none;     /* Firefox */
 }
+
+/* react-phone-input-2 Custom Overrides for Premium Glassmorphism */
+.react-tel-input {
+  @apply font-sans w-full;
+}
+
+.react-tel-input .flag-dropdown {
+  @apply bg-transparent border-none rounded-l-xl pl-2;
+}
+
+.react-tel-input .selected-flag {
+  @apply bg-transparent hover:bg-slate-100 rounded-l-xl transition-colors;
+}
+.dark .react-tel-input .selected-flag {
+  @apply hover:bg-slate-700;
+}
+.react-tel-input .flag-dropdown.open .selected-flag {
+  @apply bg-slate-100 rounded-l-xl;
+}
+.dark .react-tel-input .flag-dropdown.open .selected-flag {
+  @apply bg-slate-700;
+}
+
+.react-tel-input .country-list {
+  @apply bg-white border border-slate-200 rounded-xl shadow-lg mt-2 text-slate-900 overflow-hidden;
+  scrollbar-width: thin;
+}
+.dark .react-tel-input .country-list {
+  @apply bg-slate-800 border-slate-700 text-slate-100;
+}
+
+.react-tel-input .country-list .country {
+  @apply hover:bg-slate-50 p-3 transition-colors;
+}
+.dark .react-tel-input .country-list .country {
+  @apply hover:bg-slate-700;
+}
+
+.react-tel-input .country-list .country.highlight {
+  @apply bg-primary-50 text-primary-700;
+}
+.dark .react-tel-input .country-list .country.highlight {
+  @apply bg-primary-900/30 text-primary-300;
+}
+
+.react-tel-input .country-list .search {
+  @apply bg-white p-2;
+}
+.dark .react-tel-input .country-list .search {
+  @apply bg-slate-800;
+}
+
+.react-tel-input .country-list .search-box {
+  @apply bg-slate-50 border-slate-200 text-slate-900 p-2 rounded-lg w-full outline-none focus:border-primary-500;
+}
+.dark .react-tel-input .country-list .search-box {
+  @apply bg-slate-900 border-slate-700 text-white focus:border-primary-500;
+}

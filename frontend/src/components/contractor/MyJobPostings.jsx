@@ -155,7 +155,7 @@ export default function MyJobPostings({ onNewJobClick, onNavigateToMessages }) {
 
         {/* search */}
         <div className="relative w-full sm:w-80">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute z-10 left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
           <input
             type="text"
             value={search}

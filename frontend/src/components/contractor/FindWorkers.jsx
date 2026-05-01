@@ -80,15 +80,15 @@ export default function FindWorkers({ onNavigateToMessages }) {
             setFiltered([]);
             return;
         }
-
-        let result = [...workers];
-
+        const currentUser = JSON.parse(localStorage.getItem("user"));
+        let result = workers.filter(w => w && w.user && w.user.email !== currentUser.email); // Exclude self from results
         if (search.trim()) {
             const q = search.toLowerCase();
             const safeIncludes = (val, query) => (val ? String(val).toLowerCase().includes(query) : false);
 
             result = result.filter((w) => {
                 if (!w) return false;
+                // Exclude self from search results
                 const skillsArr = parseSkills(w?.skills);
                 const nameMatch = safeIncludes(w?.user?.name, q);
                 const locMatch = safeIncludes(w?.user?.location, q);
@@ -282,8 +282,7 @@ function WorkerCard({ worker, onViewProfile, onNavigateToMessages }) {
 
     const name = worker.user?.name || "Worker";
     const initials = name ? String(name).charAt(0).toUpperCase() : "W";
-
-    // Parse skills properly, whether array, JSON string, or comma-separated
+    console.log(worker);
     let skills = [];
     if (Array.isArray(worker.skills)) {
         skills = worker.skills;
@@ -305,9 +304,9 @@ function WorkerCard({ worker, onViewProfile, onNavigateToMessages }) {
         <div className="card p-6 flex flex-col gap-4 hover:shadow-2xl transition-all duration-300">
             {/* Avatar + Name */}
             <div className="flex items-center gap-4">
-                {worker.profilePhoto ? (
+                {worker.user.profilePhoto ? (
                     <img
-                        src={worker.profilePhoto}
+                        src={worker.user.profilePhoto}
                         alt={name}
                         className="w-14 h-14 rounded-full object-cover shadow"
                     />

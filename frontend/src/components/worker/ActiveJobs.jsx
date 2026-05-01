@@ -6,7 +6,6 @@ export default function ActiveJobs({ jobs, onJobComplete }) {
     const completingRef = useRef(new Set());
 
     useEffect(() => {
-        // Update timer every second
         const interval = setInterval(() => {
             setNow(Date.now());
         }, 1000);
@@ -44,9 +43,14 @@ export default function ActiveJobs({ jobs, onJobComplete }) {
 
     return (
         <div className="card p-6 sm:p-8">
-            <h2 className="text-2xl font-black mb-6 text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            {jobs.length === 0 && (
+                <div className="text-center py-10">
+                    <p className="text-slate-500 dark:text-slate-400 font-medium">No active jobs at the moment.</p>
+                </div>
+            )} 
+            {jobs.length !== 0 && (<h2 className="text-2xl font-black mb-6 text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                 <Clock className="w-6 h-6 text-primary-500" /> Active Jobs
-            </h2>
+            </h2>)}
             <div className="space-y-4">
                 {jobs.map((job) => {
                     const elapsed = now - job.startTime;

@@ -5,6 +5,8 @@ import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/
 import { auth, googleProvider } from "../firebase/config";
 import { signInWithPopup } from "firebase/auth";
 import { FcGoogle } from "react-icons/fc";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 export default function SignupPage() {
     const navigate = useNavigate();
@@ -117,8 +119,8 @@ export default function SignupPage() {
             alert("Please enter a valid email address");
             return;
         }
-        if (formData.phone.length > 10) {
-            alert("Phone number should not exceed 10 digits");
+        if (!formData.phone || formData.phone.length < 10) {
+            alert("Please enter a valid phone number");
             return;
         }
         if (formData.password !== formData.confirmPassword) {
@@ -141,11 +143,14 @@ export default function SignupPage() {
             // Send Firebase Email Verification Link
             await sendEmailVerification(user);
             
+            const formattedPhone = formData.phone.startsWith('+') ? formData.phone : '+' + formData.phone;
+            const finalFormData = { ...formData, phone: formattedPhone };
+            
             // Store registration details temporarily in localStorage
-            localStorage.setItem('pending_registration', JSON.stringify(formData));
+            localStorage.setItem('pending_registration', JSON.stringify(finalFormData));
 
             // Redirect to verify-email
-            navigate("/verify-email", { state: { formData } });
+            navigate("/verify-email", { state: { formData: finalFormData } });
 
         } catch (error) {
             console.error(error);
@@ -286,21 +291,19 @@ export default function SignupPage() {
                         {/* Phone */}
                         <div>
                             <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Phone Number</label>
-                            <div className="relative group">
-                                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
-                                <input
-                                    type="tel"
-                                    minLength={10}
-                                    maxLength={10}
+                            <div className="relative group phone-input-container">
+                                <PhoneInput
+                                    country={'in'}
+                                    onlyCountries={['in', 'us']}
                                     value={formData.phone}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (/^\d*$/.test(value)) {
-                                            setFormData({ ...formData, phone: value });
-                                        }
+                                    onChange={(phone) => setFormData({ ...formData, phone })}
+                                    inputProps={{
+                                        name: 'phone',
+                                        required: true,
                                     }}
-                                    className="input pl-12 py-3.5 text-base"
-                                    placeholder="1234567890"
+                                    containerClass="w-full"
+                                    inputClass="input !pl-[52px] !w-full !h-auto !py-3.5"
+                                    buttonClass="!bg-transparent !border-none !rounded-l-xl pl-2"
                                 />
                             </div>
                         </div>

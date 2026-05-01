@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Navigate, Link } from 'react-router-dom';
 import { auth } from '../firebase/config';
-import { RecaptchaVerifier, linkWithPhoneNumber } from 'firebase/auth';
+import { RecaptchaVerifier, PhoneAuthProvider, linkWithPhoneNumber } from 'firebase/auth';
 import { Smartphone, RefreshCw, CheckCircle, AlertCircle, Briefcase, KeyRound, ArrowRight } from 'lucide-react';
+import { signInWithPhoneNumber } from 'firebase/auth';
 
 export default function VerifyPhone() {
     const location = useLocation();
@@ -36,6 +37,7 @@ export default function VerifyPhone() {
             }
             setPhone(formattedPhone);
         }
+        console.log('Loaded formData for phone verification:', formData);
     }, [formData]);
 
     // Check if there is no user or form data
@@ -71,8 +73,8 @@ export default function VerifyPhone() {
         try {
             setupRecaptcha();
             const appVerifier = window.recaptchaVerifier;
-            const linkResult = await linkWithPhoneNumber(auth.currentUser, phone, appVerifier);
-            setConfirmationResult(linkResult);
+            const result = await signInWithPhoneNumber(auth, phone, appVerifier);
+            setConfirmationResult(result);
             setStep('otp');
             setMessage('OTP sent to your phone! Please enter the 6-digit code below.');
         } catch (err) {
@@ -82,7 +84,7 @@ export default function VerifyPhone() {
                 window.recaptchaVerifier.clear();
                 window.recaptchaVerifier = null;
             }
-            
+
             if (err.code === 'auth/invalid-phone-number') {
                 setError('Invalid phone number format. Please include the country code (e.g., +91).');
             } else if (err.code === 'auth/credential-already-in-use') {
@@ -105,8 +107,11 @@ export default function VerifyPhone() {
         setOtpLoading(true);
         setError('');
         try {
-            await confirmationResult.confirm(otp);
-            // Phone Linked Successfully
+            const credential = PhoneAuthProvider.credential(
+                confirmationResult.verificationId,
+                otp
+            );
+            await linkWithCredential(auth.currentUser, credential);
             setMessage('Phone verified! Completing your registration...');
             await completeRegistration();
         } catch (err) {
@@ -125,7 +130,6 @@ export default function VerifyPhone() {
 
     const completeRegistration = async () => {
         try {
-            // 1. Create User in backend
             const res = await fetch(`${BASE_URL}/api/users`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -137,7 +141,7 @@ export default function VerifyPhone() {
                     phone: phone || formData.phone || "",
                 }),
             });
-            
+
             if (!res.ok) throw new Error("Failed to create database user.");
             const dbUser = await res.json();
 
@@ -147,18 +151,15 @@ export default function VerifyPhone() {
                 uid: auth.currentUser.uid,
             }));
             localStorage.setItem("uid", dbUser.id);
-            
-            // Remove pending registration from localStorage
             localStorage.removeItem('pending_registration');
 
-            // 3. Create Role record
             try {
                 const roleRes = await fetch(`${BASE_URL}/api/${formData.role}s`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ user: { id: dbUser.id } })
                 });
-                
+
                 if (roleRes.ok) {
                     const roleData = await roleRes.json();
                     if (formData.role === "worker") {
@@ -195,34 +196,34 @@ export default function VerifyPhone() {
 
                 {/* Professional Minimalist 3D Core Scene for Verification */}
                 <div className="relative z-10 w-full flex items-center justify-center p-12">
-                   <div className="relative w-72 h-72 sm:w-96 sm:h-96 flex items-center justify-center preserve-3d">
-                      {/* Outer Orbital Rings */}
-                      <div 
-                         className="absolute inset-0 rounded-full border border-slate-600/30 border-t-indigo-500/40" 
-                         style={{ transform: 'rotateX(60deg) rotateY(-15deg)', animation: 'spin 15s linear infinite reverse' }}
-                      ></div>
-                      <div 
-                         className="absolute inset-8 rounded-full border border-slate-600/20 border-b-emerald-400/40" 
-                         style={{ transform: 'rotateX(75deg) rotateY(10deg)', animation: 'spin 10s linear infinite' }}
-                      ></div>
-                      
-                      {/* Central Premium Glass Core */}
-                      <div 
-                         className="relative w-36 h-36 rounded-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 p-[1px] shadow-[0_0_60px_rgba(99,102,241,0.3)] animate-float-3d z-10"
-                      >
-                         <div className="w-full h-full rounded-full bg-slate-900/90 backdrop-blur-xl flex items-center justify-center border border-white/10 shadow-inner overflow-hidden relative">
-                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent"></div>
-                            <Smartphone className="w-12 h-12 text-indigo-300 relative z-10 drop-shadow-[0_0_15px_rgba(99,102,241,0.8)]" />
-                         </div>
-                      </div>
+                    <div className="relative w-72 h-72 sm:w-96 sm:h-96 flex items-center justify-center preserve-3d">
+                        {/* Outer Orbital Rings */}
+                        <div
+                            className="absolute inset-0 rounded-full border border-slate-600/30 border-t-indigo-500/40"
+                            style={{ transform: 'rotateX(60deg) rotateY(-15deg)', animation: 'spin 15s linear infinite reverse' }}
+                        ></div>
+                        <div
+                            className="absolute inset-8 rounded-full border border-slate-600/20 border-b-emerald-400/40"
+                            style={{ transform: 'rotateX(75deg) rotateY(10deg)', animation: 'spin 10s linear infinite' }}
+                        ></div>
 
-                      {/* Orbiting Envelope Node */}
-                      <div className="absolute w-full h-full" style={{ animation: 'spin 20s linear infinite reverse' }}>
-                         <div className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-slate-800 border border-indigo-500/40 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]" style={{ transform: 'rotateX(-60deg)' }}>
-                            <KeyRound className="w-5 h-5 text-indigo-400 animate-pulse" />
-                         </div>
-                      </div>
-                   </div>
+                        {/* Central Premium Glass Core */}
+                        <div
+                            className="relative w-36 h-36 rounded-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 p-[1px] shadow-[0_0_60px_rgba(99,102,241,0.3)] animate-float-3d z-10"
+                        >
+                            <div className="w-full h-full rounded-full bg-slate-900/90 backdrop-blur-xl flex items-center justify-center border border-white/10 shadow-inner overflow-hidden relative">
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent"></div>
+                                <Smartphone className="w-12 h-12 text-indigo-300 relative z-10 drop-shadow-[0_0_15px_rgba(99,102,241,0.8)]" />
+                            </div>
+                        </div>
+
+                        {/* Orbiting Envelope Node */}
+                        <div className="absolute w-full h-full" style={{ animation: 'spin 20s linear infinite reverse' }}>
+                            <div className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-slate-800 border border-indigo-500/40 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]" style={{ transform: 'rotateX(-60deg)' }}>
+                                <KeyRound className="w-5 h-5 text-indigo-400 animate-pulse" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="absolute bottom-12 text-center w-full px-12 text-slate-400 font-medium z-20">
@@ -245,7 +246,7 @@ export default function VerifyPhone() {
                     <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-500/10 border border-indigo-100 dark:border-indigo-800/50">
                         <Smartphone className="w-10 h-10 text-indigo-600 dark:text-indigo-400" />
                     </div>
-                    
+
                     <div>
                         <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-2 tracking-tight">Verify Phone</h1>
                         <p className="text-slate-500 dark:text-slate-400 text-lg">Secure your account with an SMS code</p>
@@ -338,7 +339,7 @@ export default function VerifyPhone() {
                                 )}
                                 {otpLoading ? 'Verifying...' : 'Complete Registration'}
                             </button>
-                            
+
                             <button
                                 type="button"
                                 onClick={() => setStep('phone')}

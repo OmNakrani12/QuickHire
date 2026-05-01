@@ -115,7 +115,7 @@ export default function PostJob() {
                         <PlusCircle className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold gradient-text">Post a New Job</h2>
+                        <h2 className="text-2xl font-bold text-secondary-400">Post a New Job</h2>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">
                             Fill in the details below to publish a new job listing
                         </p>

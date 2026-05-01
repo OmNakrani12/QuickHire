@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
     X,
     Star,
@@ -9,29 +9,50 @@ import {
     Phone,
     Award
 } from "lucide-react";
+import axios from "axios";
 
 export default function WorkerProfileModal({ worker, onClose, onHire, onMessage }) {
-    if (!worker) return null;
+    const [reviews, setReviews] = useState([]);
+    const [avgRating, setAvgRating] = useState(0);
+    const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
+    useEffect(() => {
+        if (!worker) return;
+
+        const fetchReviews = async () => {
+            try {
+                const res = await axios.get(`${BASE_URL}/api/reviews/user/${worker.user.id}`);
+                const reviewsData = res.data;
+                setReviews(reviewsData);
+                if (reviewsData.length > 0) {
+                    const sum = reviewsData.reduce((acc, r) => acc + r.rating, 0);
+                    setAvgRating((sum / reviewsData.length).toFixed(1));
+                }
+            } catch (err) {
+                console.error("Error fetching reviews:", err);
+            }
+        };
+
+        fetchReviews();
+        document.body.style.overflow = "hidden";
+        return () => (document.body.style.overflow = "auto");
+    }, [worker, BASE_URL]);
+
+    if (!worker) return null;
+    console.log("Worker data in modal:", worker);
+    console.log("Reviews data in modal:", reviews);
     const name = worker.user?.name || "Worker";
     const location = worker.user?.location || "Location not set";
     const email = worker.user?.email;
     const phone = worker.user?.phone;
-    const rating = worker.rating ?? 0;
     const experience = worker.experience ?? 0;
     const skills = Array.isArray(worker.skills) ? worker.skills : [];
     const certifications = Array.isArray(worker.certifications) ? worker.certifications : [];
-
-    useEffect(() => {
-        document.body.style.overflow = "hidden";
-        return () => (document.body.style.overflow = "auto");
-    }, []);
-
     return (
         <div className="fixed inset-0 z-[70] bg-black/20 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-            <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-modal dark:bg-slate-900 border dark:border-slate-800" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-modal dark:bg-slate-900 border dark:border-slate-800 flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
-                <div className="flex justify-between items-center px-6 py-4 border-b dark:border-slate-800">
+                <div className="flex justify-between items-center px-6 py-4 border-b dark:border-slate-800 shrink-0">
                     <h2 className="text-lg font-semibold text-slate-800 dark:text-white">
                         Worker Details
                     </h2>
@@ -43,126 +64,113 @@ export default function WorkerProfileModal({ worker, onClose, onHire, onMessage 
                     </button>
                 </div>
 
-                <div className="grid md:grid-cols-3">
+                <div className="overflow-y-auto">
+                    <div className="grid md:grid-cols-3">
+                        {/* LEFT PROFILE PANEL */}
+                        <div className="bg-secondary-50 dark:bg-slate-800/50 p-6 border-r dark:border-slate-800 flex flex-col items-center text-center">
+                            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-secondary-500 to-secondary-600 text-white text-3xl font-bold flex items-center justify-center shadow-lg">
+                                <img
+                                    src={worker.user.profilePhoto}
+                                    alt="Worker"
+                                    className="w-24 h-24 rounded-full object-cover"
+                                />
+                            </div>
 
-                    {/* LEFT PROFILE PANEL */}
-                    <div className="bg-secondary-50 dark:bg-slate-800/50 p-6 border-r dark:border-slate-800 flex flex-col items-center text-center">
-                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-secondary-500 to-secondary-600 text-white text-3xl font-bold flex items-center justify-center shadow-lg">
-                            {name.charAt(0)}
+                            <h3 className="mt-4 text-xl font-bold dark:text-white">{name}</h3>
+                            <p className="text-slate-500 flex items-center gap-1 mt-1 dark:text-slate-400 text-sm">
+                                <MapPin className="w-4 h-4" />
+                                {location}
+                            </p>
+
+                            <div className="flex items-center gap-1 mt-4 text-amber-500">
+                                <Star className="w-5 h-5 fill-amber-400" />
+                                <span className="font-black text-2xl">{avgRating || '0.0'}</span>
+                                <span className="text-xs text-slate-400 ml-1">({reviews.length} reviews)</span>
+                            </div>
+
+                            <div className="mt-4 text-sm font-medium text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                                <Briefcase className="w-4 h-4" />
+                                {experience} Jobs Completed
+                            </div>
+
+                            <div className="mt-8 w-full space-y-3">
+                                <button
+                                    onClick={() => onHire?.(worker)}
+                                    className="w-full bg-secondary-600 hover:bg-secondary-700 text-white py-3 rounded-xl font-bold transition shadow-md shadow-secondary-500/20"
+                                >
+                                    Hire Worker
+                                </button>
+
+                                <button
+                                    onClick={() => onMessage?.(worker)}
+                                    className="w-full border border-secondary-300 dark:border-slate-600 dark:text-slate-300 py-3 rounded-xl hover:bg-secondary-100 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2 font-bold"
+                                >
+                                    <MessageSquare className="w-4 h-4" />
+                                    Message
+                                </button>
+                            </div>
                         </div>
 
-                        <h3 className="mt-4 text-xl font-bold dark:text-white">{name}</h3>
-                        <p className="text-slate-500 flex items-center gap-1 mt-1 dark:text-slate-400">
-                            <MapPin className="w-4 h-4" />
-                            {location}
-                        </p>
+                        {/* RIGHT DETAILS PANEL */}
+                        <div className="col-span-2 p-6 space-y-8">
+                            {/* Bio */}
+                            {worker.user?.bio && (
+                                <div>
+                                    <h4 className="font-bold text-slate-800 dark:text-white mb-2 uppercase tracking-wider text-xs">
+                                        Professional Summary
+                                    </h4>
+                                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                                        {worker.user.bio}
+                                    </p>
+                                </div>
+                            )}
 
-                        <div className="flex items-center gap-1 mt-3 text-yellow-500">
-                            <Star className="w-4 h-4 fill-yellow-400" />
-                            <span className="font-semibold">{rating}</span>
-                        </div>
+                            {/* Skills */}
+                            {skills.length > 0 && (
+                                <div>
+                                    <h4 className="font-bold text-slate-800 dark:text-white mb-3 uppercase tracking-wider text-xs">
+                                        Skills & Expertise
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {skills.map((skill, i) => (
+                                            <span
+                                                key={i}
+                                                className="px-4 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs rounded-full font-bold shadow-sm"
+                                            >
+                                                {typeof skill === "object" ? skill.name : skill}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
-                        <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
-                            <Briefcase className="w-4 h-4 inline mr-1" />
-                            {experience} Jobs Completed
-                        </div>
-
-                        <div className="mt-6 w-full space-y-2">
-                            <button
-                                onClick={() => onHire?.(worker)}
-                                className="w-full bg-secondary-600 hover:bg-secondary-700 text-white py-2 rounded-lg font-medium transition"
-                            >
-                                Hire Worker
-                            </button>
-
-                            <button
-                                onClick={() => onMessage?.(worker)}
-                                className="w-full border border-secondary-300 dark:border-slate-600 dark:text-slate-300 py-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2"
-                            >
-                                <MessageSquare className="w-4 h-4" />
-                                Message
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* RIGHT DETAILS PANEL */}
-                    <div className="col-span-2 p-6 space-y-6">
-
-                        {/* Contact Info */}
-                        {(email || phone) && (
+                            {/* Recent Reviews */}
                             <div>
-                                <h4 className="font-semibold text-slate-800 dark:text-white mb-3">
-                                    Contact Information
+                                <h4 className="font-bold text-slate-800 dark:text-white mb-4 uppercase tracking-wider text-xs flex items-center gap-2">
+                                    <Award className="w-4 h-4 text-amber-500" />
+                                    Recent Reviews
                                 </h4>
-                                <div className="grid sm:grid-cols-2 gap-4">
-                                    {email && (
-                                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
-                                            <Mail className="w-4 h-4 text-secondary-500 dark:text-secondary-400" />
-                                            <span className="text-sm dark:text-slate-300">{email}</span>
-                                        </div>
+                                <div className="space-y-4">
+                                    {reviews.length > 0 ? (
+                                        reviews.slice(0, 3).map((review) => (
+                                            <div key={review.id} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div className="font-bold text-slate-800 dark:text-white text-sm">{review.reviewer?.name}</div>
+                                                    <div className="flex text-amber-400">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <Star key={i} className={`w-3 h-3 ${i < review.rating ? 'fill-current' : 'text-slate-200 dark:text-slate-700'}`} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <p className="text-slate-600 dark:text-slate-400 text-xs italic">"{review.comment}"</p>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-slate-500 dark:text-slate-400 text-sm italic">No reviews yet.</p>
                                     )}
-                                    {phone && (
-                                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
-                                            <Phone className="w-4 h-4 text-secondary-500 dark:text-secondary-400" />
-                                            <span className="text-sm dark:text-slate-300">{phone}</span>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
-                        )}
-
-                        {/* Skills */}
-                        {skills.length > 0 && (
-                            <div>
-                                <h4 className="font-semibold text-slate-800 dark:text-white mb-3">
-                                    Skills & Expertise
-                                </h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {skills.map((skill, i) => (
-                                        <span
-                                            key={i}
-                                            className="px-3 py-1 bg-secondary-50 dark:bg-slate-800 text-secondary-600 dark:text-secondary-400 text-sm rounded-full font-medium"
-                                        >
-                                            {typeof skill === "object"
-                                                ? skill.name
-                                                : skill}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Bio */}
-                        {worker.user?.bio && (
-                            <div>
-                                <h4 className="font-semibold text-slate-800 dark:text-white mb-2">
-                                    About Worker
-                                </h4>
-                                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                                    {worker.user.bio}
-                                </p>
-                            </div>
-                        )}
-                        {/* Certifications */}
-                        {certifications.length > 0 && (
-                            <div>
-                                <h4 className="font-semibold text-slate-800 dark:text-white mb-3">
-                                    Certifications & Licenses
-                                </h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {certifications.map((cert, i) => (
-                                        <span
-                                            key={i}
-                                            className="px-3 py-1 bg-secondary-50 dark:bg-slate-800 text-secondary-600 dark:text-secondary-400 text-sm rounded-full font-medium"
-                                        >
-                                            {typeof cert === "object"
-                                                ? cert.name
-                                                : cert}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        </div>
                     </div>
                 </div>
             </div>

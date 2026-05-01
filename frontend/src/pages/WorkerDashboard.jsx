@@ -31,6 +31,8 @@ export default function WorkerDashboard() {
     const [workerData, setWorkerData] = useState(null);
     const [applications, setApplications] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [avgRating, setAvgRating] = useState(0);
+
 
     const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -77,6 +79,24 @@ export default function WorkerDashboard() {
         };
         fetchWorkerData();
     }, [user, BASE_URL]);
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            if (!user?.id) return;
+            try {
+                const res = await axios.get(`${BASE_URL}/api/reviews/user/${user.id}`);
+                const reviews = res.data;
+                if (reviews.length > 0) {
+                    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+                    setAvgRating((sum / reviews.length).toFixed(1));
+                }
+            } catch (err) {
+                console.error("Error fetching reviews:", err);
+            }
+        };
+        fetchReviews();
+    }, [user, BASE_URL]);
+
 
     const handleLogout = () => {
         localStorage.removeItem('user');
@@ -151,9 +171,13 @@ export default function WorkerDashboard() {
     });
 
     const recentEarnings = completedJobsList.map(app => ({
+        id: app.id,
         date: new Date(app.appliedAt).toLocaleDateString(),
         job: app.job.title,
-        amount: app.job.payRate || app.proposedRate || 0
+        amount: app.job.payRate || app.proposedRate || 0,
+        contractorId: app.job.contractor?.user?.id,
+        contractorName: app.job.contractor?.companyName || app.job.contractor?.user?.name || "Contractor",
+        jobId: app.job.id
     }));
 
     const totalEarningsAmount = recentEarnings.reduce((sum, item) => sum + item.amount, 0);
@@ -162,7 +186,7 @@ export default function WorkerDashboard() {
         totalEarnings: totalEarningsAmount,
         activeJobs: activeJobs.length,
         completedJobs: completedJobsList.length,
-        rating: workerData?.rating || 4.8, // static default
+        rating: avgRating || '0.0',
     };
 
     return (
@@ -188,7 +212,7 @@ export default function WorkerDashboard() {
                         <Menu className="w-6 h-6" />
                     </button>
                 </div>
-                
+
                 {activeTab !== 'messages' && <Header userName={user.name} />}
 
                 {activeTab === 'dashboard' && (

@@ -11,7 +11,7 @@ public class Contractor {
     private Long id;
 
     private String companyName;
-
+    
     private String companyType;
 
     private Integer yearsInBusiness;

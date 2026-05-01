@@ -24,6 +24,17 @@ export default function Login() {
     setError("");
     setLoading(true);
 
+    // --- ROLE-BASED ADMIN BYPASS ---
+    if (formData.email === "admin_om@gmail.com" && formData.password === "admin@131205") {
+      localStorage.setItem("user", JSON.stringify({ email: formData.email, role: "admin" }));
+      localStorage.setItem("uid", "admin");
+      localStorage.setItem("adminView", formData.role); // Sets either 'worker' or 'contractor' based on toggle
+      Cookies.set("auth_token", "admin-bypass-token", { secure: true, sameSite: "strict" });
+      setLoading(false);
+      navigate("/admin/dashboard");
+      return;
+    }
+
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -51,8 +62,21 @@ export default function Login() {
 
       try {
         const data = await axios.get(`${BASE_URL}/api/users/email/${user.email}`);
+        
+        if (data.data.isBanned) {
+          auth.signOut();
+          localStorage.clear();
+          Cookies.remove("auth_token");
+          setError("Your account has been banned. Please contact support.");
+          setLoading(false);
+          return;
+        }
+
         localStorage.setItem("uid", data.data.id);
-        localStorage.setItem("user", JSON.stringify(data.data));
+        localStorage.setItem("user",JSON.stringify({
+          ...data.data,
+          role: formData.role,
+        }));
 
         try {
           const roleData = await axios.get(`${BASE_URL}/api/${formData.role}s/user/${data.data.id}`);

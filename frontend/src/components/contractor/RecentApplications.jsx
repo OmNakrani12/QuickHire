@@ -34,7 +34,7 @@ export default function RecentApplications({ applications }) {
                     const name = application.name || 'Worker';
                     const initials = name.charAt(0).toUpperCase();
                     const badge = statusBadge[application.status] || statusBadge.PENDING;
-
+                    console.log("Application data:", application);
                     return (
                         <div key={application.id}
                             className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 sm:p-6 bg-slate-50 dark:bg-slate-800/40 rounded-3xl border border-slate-200/60 dark:border-slate-700/60 hover:shadow-lg hover:shadow-slate-200/30 dark:hover:shadow-black/30 hover:-translate-y-0.5 transition-all duration-300 group relative overflow-hidden gap-4">
@@ -43,11 +43,12 @@ export default function RecentApplications({ applications }) {
 
                             {/* avatar + info */}
                             <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10 w-full">
-                                <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white font-black text-xl shrink-0 shadow-lg shadow-primary-500/30 dark:shadow-none">
+                                {/* <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white font-black text-xl shrink-0 shadow-lg shadow-primary-500/30 dark:shadow-none">
                                     {initials}
-                                </div>
+                                </div> */}
+                                <img src={application.worker.user.profilePhoto} alt={`${initials}`} className='w-14 h-14 rounded-full'/>
                                 <div className="min-w-0 flex-1 pr-4">
-                                    <div className="font-extrabold text-lg text-slate-900 dark:text-white truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors tracking-tight">{name}</div>
+                                    <div className="font-extrabold text-lg text-slate-900 dark:text-white truncate group-hover:text-secondary-600 dark:group-hover:text-secondary-400 transition-colors tracking-tight">{name}</div>
                                     <div className="text-sm font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">
                                         Applied for: <span className="font-bold text-slate-700 dark:text-slate-300">{application.job}</span>
                                     </div>
@@ -74,9 +75,9 @@ export default function RecentApplications({ applications }) {
                                 <span className={`px-4 py-1.5 text-xs font-bold rounded-full uppercase tracking-widest ${badge}`}>
                                     {application.status}
                                 </span>
-                                <button className="btn btn-primary py-2.5 px-6 text-sm flex items-center gap-2 group/btn shadow-md shadow-primary-500/20">
+                                <button className="btn btn-secondary py-2.5 px-6 text-sm flex items-center gap-2 group/btn shadow-md shadow-primary-500/20">
                                     <Briefcase className="w-4 h-4 group-hover/btn:-translate-y-0.5 transition-transform" />
-                                    Hire
+                                    {application.status === 'PENDING' ? 'Hire' : 'Hired'}
                                 </button>
                             </div>
                         </div>

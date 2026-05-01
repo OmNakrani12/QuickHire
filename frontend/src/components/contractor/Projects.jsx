@@ -150,7 +150,7 @@ export default function Projects() {
             <div className="card p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h2 className="text-2xl font-bold gradient-text">Projects</h2>
+                        <h2 className="text-2xl font-bold text-secondary-400">Projects</h2>
                         <p className="text-slate-500 mt-1">Manage all your construction projects</p>
                     </div>
                     <button onClick={openCreate} className="btn btn-secondary flex items-center gap-2 py-2.5 px-5 text-sm">
@@ -162,7 +162,7 @@ export default function Projects() {
 
             {/* ── STATS STRIP ──────────────────────────────── */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatCard icon={<FolderOpen className="w-5 h-5 text-primary-500" />} label="Total" value={stats.total} />
+                <StatCard icon={<FolderOpen className="w-5 h-5 text-secondary-500" />} label="Total" value={stats.total} />
                 <StatCard icon={<TrendingUp className="w-5 h-5 text-green-600" />} label="Active" value={stats.active} />
                 <StatCard icon={<Pause className="w-5 h-5 text-yellow-500" />} label="Paused" value={stats.paused} />
                 <StatCard icon={<CheckCircle2 className="w-5 h-5 text-secondary-600" />} label="Completed" value={stats.completed} />
@@ -171,7 +171,7 @@ export default function Projects() {
             {/* Overall budget bar */}
             <div className="card p-5">
                 <div className="flex items-center gap-2 mb-3">
-                    <DollarSign className="w-5 h-5 text-primary-500" />
+                    <DollarSign className="w-5 h-5 text-secondary-500" />
                     <span className="font-semibold text-slate-700">Overall Budget</span>
                 </div>
                 <div className="flex items-end justify-between mb-2">
@@ -316,7 +316,7 @@ function ProjectCard({ project, onEdit, onDelete }) {
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-2 gap-3 mt-1">
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 transition-colors group-hover:bg-primary-50 dark:group-hover:bg-primary-900/10 group-hover:border-primary-100 dark:group-hover:border-primary-800/30">
-                        <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/40 text-secondary-600 dark:text-secondary-400 flex items-center justify-center shrink-0">
                             <Users className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">
@@ -326,7 +326,7 @@ function ProjectCard({ project, onEdit, onDelete }) {
                     </div>
                     
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 transition-colors group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/10 group-hover:border-indigo-100 dark:group-hover:border-indigo-800/30">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-secondary-600 dark:text-secondary-400 flex items-center justify-center shrink-0">
                             <Calendar className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">

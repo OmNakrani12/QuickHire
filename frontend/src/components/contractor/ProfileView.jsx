@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Star, Award, CheckCircle, Briefcase } from "lucide-react";
+import Loading from "@/Loading";
 
 export default function ContractorProfileView() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
+  const [reviews, setReviews] = useState([]);
+  const [avgRating, setAvgRating] = useState(0);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -31,20 +35,28 @@ export default function ContractorProfileView() {
 
         // Keep localStorage synced
         localStorage.setItem("user", JSON.stringify(data));
+
+        // Fetch reviews
+        const reviewsRes = await fetch(`${BASE_URL}/api/reviews/user/${data.user.id}`);
+        if (reviewsRes.ok) {
+          const reviewsData = await reviewsRes.json();
+          setReviews(reviewsData);
+          
+          if (reviewsData.length > 0) {
+            const sum = reviewsData.reduce((acc, r) => acc + r.rating, 0);
+            setAvgRating((sum / reviewsData.length).toFixed(1));
+          }
+        }
       } catch (error) {
         console.error("Error loading contractor profile:", error);
       }
     };
 
     loadProfile();
-  }, [navigate]);
+  }, [navigate, BASE_URL]);
 
   if (!user) {
-    return (
-      <div className="card p-8 dark:bg-slate-800">
-        <p className="text-slate-600 dark:text-slate-400">Loading profile...</p>
-      </div>
-    );
+    return <Loading/>
   }
 
   return (
@@ -83,6 +95,17 @@ export default function ContractorProfileView() {
             <p className="text-slate-600 dark:text-slate-400 mb-3">
               {user.email}
             </p>
+
+            {/* Rating */}
+            <div className="flex items-center mb-3">
+              <Star className="w-5 h-5 fill-amber-400 text-amber-400 mr-1" />
+              <span className="font-bold text-lg dark:text-slate-200">
+                {avgRating || "0.0"}
+              </span>
+              <span className="text-slate-500 dark:text-slate-400 ml-2">
+                ({reviews.length} reviews)
+              </span>
+            </div>
 
             {/* Company Name */}
             <div className="flex items-center text-secondary-600 dark:text-secondary-400 font-semibold">
@@ -176,6 +199,47 @@ export default function ContractorProfileView() {
             </p>
           </div>
 
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="card p-6 sm:p-8 dark:bg-slate-800 border dark:border-slate-700">
+        <h3 className="text-xl font-bold mb-6 flex items-center dark:text-white">
+          <Star className="w-5 h-5 mr-2 text-amber-500" />
+          User Reviews
+        </h3>
+
+        <div className="grid gap-6">
+          {reviews.length > 0 ? (
+            reviews.map((review) => (
+              <div key={review.id} className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center font-bold text-primary-700 dark:text-primary-300">
+                      {review.reviewer?.name?.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-bold text-slate-900 dark:text-white">{review.reviewer?.name}</div>
+                      <div className="text-[10px] text-slate-400">{new Date(review.createdAt).toLocaleDateString()}</div>
+                    </div>
+                  </div>
+                  <div className="flex text-amber-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'text-slate-200 dark:text-slate-700'}`} />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed italic italic">
+                  "{review.comment}"
+                </p>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-10 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl">
+              <Award className="w-12 h-12 text-slate-200 dark:text-slate-800 mx-auto mb-3" />
+              <p className="text-slate-500 dark:text-slate-400">No reviews yet for this contractor.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

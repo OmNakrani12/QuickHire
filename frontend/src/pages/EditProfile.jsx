@@ -4,6 +4,7 @@ import Sidebar from '../components/worker/Sidebar';
 import {
     User, Mail, Phone, MapPin, Briefcase, Award, Camera, Save, X, Plus, Trash2, DollarSign, Clock, FileText, Menu
 } from 'lucide-react';
+import axios from 'axios';
 
 export default function EditProfile() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -96,19 +97,63 @@ export default function EditProfile() {
     const handleRemoveCertification = (certToRemove) => {
         setFormData(prev => ({ ...prev, certifications: prev.certifications.filter(c => c !== certToRemove) }));
     };
+    const uploadImage = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        console.log("Uploading image with formData:", formData.get("file"));
+        const res = await axios.post(
+            `${BASE_URL}/api/upload`,
+            formData,   // ✅ correct
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }
+        );
 
+        return res.data;
+    };
     const handleSave = async () => {
-        setIsSaving(true);
-        await fetch(`${BASE_URL}/api/workers/profile/${formData.email}`, {
-            method: "PATCH", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...formData, hourlyRate: formData.hourlyRate === '' ? null : formData.hourlyRate, experience: formData.experience === '' ? null : formData.experience, profilePhoto: photoPreview }),
-        });
-        setTimeout(() => {
-            const updatedUser = { ...user, ...formData, profilePhoto: photoPreview || user.profilePhoto };
+        try {
+            setIsSaving(true);
+
+            let imageUrl = user.profilePhoto;
+
+            // upload only if new image selected
+            if (profilePhoto) {
+                imageUrl = await uploadImage(profilePhoto);
+            }
+
+            // update backend
+            await fetch(`${BASE_URL}/api/workers/profile/${formData.email}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...formData,
+                    hourlyRate: formData.hourlyRate || null,
+                    experience: formData.experience || null,
+                    profilePhoto: imageUrl   // ✅ correct
+                }),
+            });
+
+            // update UI + localStorage
+            const updatedUser = {
+                ...user,
+                ...formData,
+                profilePhoto: imageUrl
+            };
+
             localStorage.setItem('user', JSON.stringify(updatedUser));
-            setIsSaving(false);
+            setUser(updatedUser);
+
             navigate('/worker/dashboard');
-        }, 1000);
+
+        } catch (err) {
+            console.error("Error:", err);
+            alert("Upload failed");
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const handleCancel = () => navigate('/worker/dashboard');
